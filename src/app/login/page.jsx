@@ -2,11 +2,62 @@
 
 import { Box, Text, Flex, Input, Button, Icon } from "@chakra-ui/react"
 import NavBar from "@/components/NavBar/NavBar"
+import AlertDefault from "@/components/AlertDefault/AlertDefault"
 import { IoPersonCircleSharp } from "react-icons/io5"
 import Link from "next/link"
 import { FcGoogle } from "react-icons/fc"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+
+
+function traduzirErro(codigo) {
+  const mensagens = {
+    'auth/invalid-credential': 'E-mail ou senha incorretos.',
+    'auth/user-not-found': 'Nenhuma conta encontrada com este e-mail.',
+    'auth/wrong-password': 'Senha incorreta. Tente novamente.',
+    'auth/invalid-email': 'E-mail inválido.',
+    'auth/user-disabled': 'Esta conta foi desativada.',
+    'auth/too-many-requests': 'Muitas tentativas. Aguarde alguns minutos.',
+    'auth/network-request-failed': 'Erro de conexão. Verifique sua internet.',
+  }
+  return mensagens[codigo] ?? 'Ocorreu um erro inesperado. Tente novamente.'
+}
 
 export default function Login() {
+  const router = useRouter()
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [erro, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+
+
+
+
+  useEffect(() => {
+    if (erro) {
+      setTimeout(() => {
+        setError("")
+      }, 5000)
+    }
+  }, [erro])
+
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true)
+      await signInWithEmailAndPassword(auth, email, password)
+      router.push("/")
+    } catch (error) {
+      setError(traduzirErro(error.code))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <Box minH="100vh">
       <NavBar />
@@ -16,6 +67,9 @@ export default function Login() {
         justifyContent="center"
         px={{ base: 4, md: 0 }}
       >
+        {erro && (
+          <AlertDefault status="error" description={erro} />
+        )}
         <Flex
           flexDir="column"
           w={{ base: "100%", sm: "400px" }}
@@ -52,6 +106,8 @@ export default function Login() {
                 type="email"
                 size="md"
                 borderRadius="md"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Flex>
 
@@ -64,6 +120,8 @@ export default function Login() {
                 type="password"
                 size="md"
                 borderRadius="md"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <Flex justifyContent="flex-end" w="100%">
                 <Link href="#">
@@ -85,6 +143,10 @@ export default function Login() {
               w="100%"
               mt={4}
               borderRadius="md"
+              onClick={handleLogin}
+              loading={loading}
+              loadingText="Entrando..."
+
             >
               Entrar na sua conta
             </Button>
