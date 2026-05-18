@@ -15,6 +15,7 @@ import {
   For,
   Icon,
   IconButton,
+  Textarea,
 } from "@chakra-ui/react"
 import { FaPlusSquare } from "react-icons/fa"
 
@@ -22,6 +23,14 @@ import { useState } from "react"
 
 export default function Tasks() {
   const [openDrawer, setOpenDrawer] = useState(false)
+  const [task, setTask] = useState({
+    title: "",
+    description: "",
+    priority: "",
+    status: "",
+    tags: [],
+    dueDate: "",
+  })
 
   return (
     <Flex p={10}>
@@ -70,6 +79,12 @@ export default function Tasks() {
                       <Stack>
                         <Field.Label>Titulo</Field.Label>
                         <Input placeholder="Titulo da tarefa" />
+                      </Stack>
+                    </Field.Root>
+                    <Field.Root>
+                      <Stack>
+                        <Field.Label>Descrição</Field.Label>
+                        <Textarea placeholder="Descrição..." />
                       </Stack>
                     </Field.Root>
                     <Field.Root>
