@@ -16,8 +16,10 @@ import {
   Icon,
   IconButton,
   Textarea,
+  Tag,
 } from "@chakra-ui/react"
 import { FaPlusSquare } from "react-icons/fa"
+import TagTask from "./components/TagTask/TagTask"
 
 import { useState } from "react"
 
@@ -32,6 +34,20 @@ export default function Tasks() {
     dueDate: "",
   })
 
+  const [tag, setTag] = useState("")
+
+  const handleAddTag = (tag) => {
+    if (tag === "") {
+      return;
+    }
+    setTask({ ...task, tags: [...task.tags, tag] })
+    setTag("")
+  }
+
+  const handleDeleteTag = (tag) => {
+    setTask({ ...task, tags: task.tags.filter((t) => t !== tag) })
+  }
+
   return (
     <Flex p={10}>
       <Flex
@@ -40,7 +56,7 @@ export default function Tasks() {
         justifyContent={"space-between"}
         flexDir={{ base: "column", md: "row" }}
       >
-        <Flex flexDir="column" ml={10}>
+        <Flex flexDir="column" ml={{ base: 0, md: 10 }} align={{ base: "center", md: "start" }} >
           <Text
             fontSize="5xl"
             fontWeight={"bold"}
@@ -53,14 +69,17 @@ export default function Tasks() {
           </Text>{" "}
           {/*Aqui serão informadas as tarefas vigentes*/}
         </Flex>
-        <Flex>
+        <Flex align={"center"} justify={"center"} w={{ base: "100%", md: "auto" }} mt={{ base: 4, md: 0 }}>
           <Button
+            w={{ base: "100%", md: "auto" }}
             colorPalette={"purple"}
-            mr={10}
+            mr={{ base: 0, md: 10 }}
             onClick={() => setOpenDrawer(true)}
           >
             Adicionar tarefa
           </Button>
+
+
         </Flex>
       </Flex>
 
@@ -78,28 +97,35 @@ export default function Tasks() {
                     <Field.Root>
                       <Stack>
                         <Field.Label>Titulo</Field.Label>
-                        <Input placeholder="Titulo da tarefa" />
+                        <Input placeholder="Titulo da tarefa" value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} />
                       </Stack>
                     </Field.Root>
                     <Field.Root>
                       <Stack>
                         <Field.Label>Descrição</Field.Label>
-                        <Textarea placeholder="Descrição..." />
+                        <Textarea placeholder="Descrição..." value={task.description} onChange={(e) => setTask({ ...task, description: e.target.value })} />
                       </Stack>
                     </Field.Root>
                     <Field.Root>
                       <Stack>
                         <Field.Label>Prioridade</Field.Label>
-                        <NativeSelect.Root>
+                        <NativeSelect.Root defaultValue={"Selecione a prioridade"} onChange={(e) => setTask({ ...task, priority: e.target.value })}>
                           <NativeSelect.Field name="Prioridade">
-                            <For each={["Baixa", "Media", "Alta", "Urgente"]}>
+                            <For each={[
+                              { label: "Selecione a prioridade", icon: "" },
+                              { label: "Baixa", icon: "🟢" },
+                              { label: "Media", icon: "🟡" },
+                              { label: "Alta", icon: "🟠" },
+                              { label: "Urgente", icon: "🔴" }
+                            ]}>
                               {(item) => (
-                                <option key={item} value={item}>
-                                  {item}
+                                <option key={item.label} value={item.label}>
+                                  {item.icon} {item.label}
                                 </option>
                               )}
                             </For>
                           </NativeSelect.Field>
+
                           <NativeSelect.Indicator />
                         </NativeSelect.Root>
                         <Field.Label>Status</Field.Label>
@@ -122,7 +148,7 @@ export default function Tasks() {
                       <Stack>
                         <Field.Label>Tags</Field.Label>
                         <Flex>
-                          <Input placeholder="Tags da tarefa" />
+                          <Input placeholder="Tags da tarefa" value={tag} onChange={(e) => setTag(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAddTag(tag)} />
                           <IconButton
                             size="lg"
                             variant="link"
@@ -133,18 +159,32 @@ export default function Tasks() {
                               cursor: "pointer",
                               transform: "translate(0, -2px)",
                             }}
-                            //onClick={() => console.log("Adicionar tag")}
+                            onClick={() => handleAddTag(tag)}
                           >
                             <Icon as={FaPlusSquare} />
                           </IconButton>
                         </Flex>
+                        {task.tags.map((tag) => (
+                          <TagTask functionDeleteTag={handleDeleteTag} key={tag} tagTitle={tag} />
+                        ))}
+
                       </Stack>
                     </Field.Root>
                   </Fieldset.Content>
                 </Fieldset.Root>
               </Drawer.Body>
               <Drawer.Footer>
-                <Button variant="outline" onClick={() => setOpenDrawer(false)}>
+                <Button variant="outline" onClick={() => {
+                  setOpenDrawer(false)
+                  setTask({
+                    title: "",
+                    description: "",
+                    priority: "",
+                    status: "",
+                    tags: [],
+                    dueDate: "",
+                  })
+                }}>
                   Sair
                 </Button>
                 <Button>Salvar</Button>
