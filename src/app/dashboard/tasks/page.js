@@ -17,15 +17,22 @@ import {
   IconButton,
   Textarea,
   Tag,
+  Switch,
 } from "@chakra-ui/react"
+import { useState } from "react"
 import { FaPlusSquare } from "react-icons/fa"
 import TagTask from "./components/TagTask/TagTask"
+import { collection, addDoc } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import AlertCustom from "../components/AlertCustom/AlertCustom"
+import ContainerTasks from "./components/ContainerTasks/ContainerTasks"
+import { v4 as uuid } from "uuid";
 
-import { useState } from "react"
 
 export default function Tasks() {
   const [openDrawer, setOpenDrawer] = useState(false)
   const [task, setTask] = useState({
+    id: uuid(),
     title: "",
     description: "",
     priority: "",
@@ -33,8 +40,10 @@ export default function Tasks() {
     tags: [],
     dueDate: "",
   })
-
+  const [hasDueDate, setHasDueDate] = useState(false)
   const [tag, setTag] = useState("")
+  const [showAler, setShowAler] = useState(false)
+
 
   const handleAddTag = (tag) => {
     if (tag === "") {
@@ -48,8 +57,27 @@ export default function Tasks() {
     setTask({ ...task, tags: task.tags.filter((t) => t !== tag) })
   }
 
+
+  const handleSaveTask = async () => {
+    const tasksCol = collection(db, "tasks")
+    await addDoc(tasksCol, task);
+    setOpenDrawer(false)
+    setTask({
+      title: "",
+      description: "",
+      priority: "",
+      status: "",
+      tags: [],
+      dueDate: "",
+    })
+    setShowAler(true)
+    setTimeout(() => {
+      setShowAler(false)
+    }, 3000)
+  }
   return (
-    <Flex p={10}>
+    <Flex p={10} flexDir={"column"} gap={5}>
+      <AlertCustom description="Tarefa adicionada com sucesso" status={"success"} open={showAler} />
       <Flex
         align={"center"}
         w={"100%"}
@@ -81,7 +109,10 @@ export default function Tasks() {
 
 
         </Flex>
+
+
       </Flex>
+      <ContainerTasks />
 
       <Drawer.Root open={openDrawer} onClose={() => setOpenDrawer(false)}>
         <Portal>
@@ -129,9 +160,9 @@ export default function Tasks() {
                           <NativeSelect.Indicator />
                         </NativeSelect.Root>
                         <Field.Label>Status</Field.Label>
-                        <NativeSelect.Root>
+                        <NativeSelect.Root defaultValue={"Selecione o status"} onChange={(e) => setTask({ ...task, status: e.target.value })} >
                           <NativeSelect.Field name="Status">
-                            <For each={["A fazer", "Fazendo", "Concluido"]}>
+                            <For each={["Selecione o status", "A fazer", "Fazendo", "Concluido"]}>
                               {(item) => (
                                 <option key={item} value={item}>
                                   {item}
@@ -170,6 +201,26 @@ export default function Tasks() {
 
                       </Stack>
                     </Field.Root>
+
+                    <Field.Root>
+                      <Stack>
+                        <Switch.Root colorPalette="purple" checked={hasDueDate} onChange={() => setHasDueDate(!hasDueDate)}>
+                          <Switch.Label>Contém prazo?</Switch.Label>
+                          <Switch.HiddenInput />
+                          <Switch.Control>
+                            <Switch.Thumb />
+                          </Switch.Control>
+                        </Switch.Root>
+                      </Stack>
+                    </Field.Root>
+                    {hasDueDate && (
+                      <Field.Root>
+                        <Stack>
+                          <Field.Label>Prazo</Field.Label>
+                          <Input placeholder="Prazo da tarefa" value={task.dueDate} type="datetime-local" onChange={(e) => setTask({ ...task, dueDate: e.target.value })} />
+                        </Stack>
+                      </Field.Root>
+                    )}
                   </Fieldset.Content>
                 </Fieldset.Root>
               </Drawer.Body>
@@ -184,16 +235,33 @@ export default function Tasks() {
                     tags: [],
                     dueDate: "",
                   })
+                  setTag("")
+
+                  setHasDueDate(false)
                 }}>
-                  Sair
+                  Cancelar
                 </Button>
-                <Button>Salvar</Button>
+                <Button onClick={() => {
+                  handleSaveTask()
+                  setOpenDrawer(false)
+                  setTask({
+                    title: "",
+                    description: "",
+                    priority: "",
+                    status: "",
+                    tags: [],
+                    dueDate: "",
+                  })
+                  setTag("")
+                  setHasDueDate(false)
+                }}>Salvar</Button>
               </Drawer.Footer>
-              <Drawer.CloseTrigger onClick={() => setOpenDrawer(false)}>
-                <CloseButton size="sm" />
-              </Drawer.CloseTrigger>
+
+
             </Drawer.Content>
+
           </Drawer.Positioner>
+
         </Portal>
       </Drawer.Root>
     </Flex>
