@@ -12,6 +12,10 @@ export default function ContainerTasks() {
   const { user } = useStore()
   const [tasks, setTasks] = useState([])
   const [tasksActive, setTasksActive] = useState([])
+  const [totalTasks, setTotalTasks] = useState(0)
+  const [totalTasksActive, setTotalTasksActive] = useState(0)
+  const [totalTasksCompleted, setTotalTasksCompleted] = useState(0)
+  const [completedTasks, setCompletedTasks] = useState([])
 
   useEffect(() => {
     if (!user) return
@@ -27,7 +31,7 @@ export default function ContainerTasks() {
         return dateA - dateB
       })
     }
-
+    //Total Tasks Active
     const unsubscribeTasks = onSnapshot(
       collection(db, "tasks"),
       (querySnapshot) => {
@@ -35,13 +39,14 @@ export default function ContainerTasks() {
         querySnapshot.forEach((doc) => {
           tasksList.push({ id: doc.id, ...doc.data() })
         })
+        setTotalTasks(tasksList.length)
         setTasks(sortTasks(tasksList))
       },
       (error) => {
         console.error("Erro ao buscar tarefas:", error)
       },
     )
-
+    // Tarefas A Fazer
     const q = query(collection(db, "tasks"), where("status", "==", "A fazer"))
     const unsubscribeActiveTasks = onSnapshot(
       q,
@@ -50,16 +55,34 @@ export default function ContainerTasks() {
         querySnapshot.forEach((doc) => {
           tasksList.push({ id: doc.id, ...doc.data() })
         })
+        setTotalTasksActive(tasksList.length)
         setTasksActive(sortTasks(tasksList))
       },
       (error) => {
         console.error("Erro ao buscar tarefas ativas:", error)
       },
     )
+    // Tarefas concluidas
+    const qCompleted = query(
+      collection(db, "tasks"),
+      where("isCompleted", "==", true),
+    )
+    const unsubscribeCompletedTasks = onSnapshot(
+      qCompleted,
+      (querySnapshot) => {
+        const completedTasksList = []
+        querySnapshot.forEach((doc) => {
+          completedTasksList.push({ id: doc.id, ...doc.data() })
+        })
+        setTotalTasksCompleted(completedTasksList.length)
+        setCompletedTasks(sortTasks(completedTasksList))
+      },
+    )
 
     return () => {
       unsubscribeTasks()
       unsubscribeActiveTasks()
+      unsubscribeCompletedTasks()
     }
   }, [user])
   return (
@@ -72,35 +95,12 @@ export default function ContainerTasks() {
           alignItems={"center"}
         >
           <Text>Faça login para adicionar tarefas</Text>
-          <MenuTask />
         </Flex>
       )}
-      <Flex mt={10}>
-        <Text fontSize={"lg"} fontWeight={"bold"}>
-          Todas as tarefas
-        </Text>
-      </Flex>
-      <Flex
-        flexDir={"column"}
-        justifyContent={"space-around"}
-        w={"100%"}
-        h={"100%"}
-      >
-        {tasks.map((task) => (
-          <CardTask
-            key={task.id}
-            title={task.title}
-            priority={task.priority}
-            tags={task.tags}
-            description={task.description}
-            dueDate={task.dueDate}
-          />
-        ))}
-      </Flex>
 
       <Flex mt={10}>
         <Text fontSize={"lg"} fontWeight={"bold"}>
-          Tarefas ativas
+          Pendentes: {totalTasksActive}
         </Text>
       </Flex>
       <Flex
@@ -112,6 +112,52 @@ export default function ContainerTasks() {
         {tasksActive.map((task) => (
           <CardTask
             key={task.id}
+            id={task.id}
+            title={task.title}
+            priority={task.priority}
+            tags={task.tags}
+            description={task.description}
+            dueDate={task.dueDate}
+          />
+        ))}
+      </Flex>
+
+      <Flex mt={10}>
+        <Text>Concluídas: {totalTasksCompleted}</Text>
+      </Flex>
+      <Flex
+        flexDir={"column"}
+        justifyContent={"space-around"}
+        w={"100%"}
+        h={"100%"}
+      >
+        {completedTasks.map((task) => (
+          <CardTask
+            key={task.id}
+            id={task.id}
+            title={task.title}
+            priority={task.priority}
+            tags={task.tags}
+            description={task.description}
+            dueDate={task.dueDate}
+          />
+        ))}
+      </Flex>
+      <Flex mt={10}>
+        <Text fontSize={"lg"} fontWeight={"bold"}>
+          Todas as tarefas: {totalTasks}
+        </Text>
+      </Flex>
+      <Flex
+        flexDir={"column"}
+        justifyContent={"space-around"}
+        w={"100%"}
+        h={"100%"}
+      >
+        {tasks.map((task) => (
+          <CardTask
+            key={task.id}
+            id={task.id}
             title={task.title}
             priority={task.priority}
             tags={task.tags}

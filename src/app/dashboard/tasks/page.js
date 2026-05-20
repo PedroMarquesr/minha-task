@@ -106,10 +106,6 @@ export default function Tasks() {
           >
             Tarefas
           </Text>
-          <Text fontSize="xl" color={"gray.600"} _dark={{ color: "gray.400" }}>
-            8 tarefas
-          </Text>{" "}
-          {/*Aqui serão informadas as tarefas vigentes*/}
         </Flex>
         <Flex
           align={"center"}
@@ -127,7 +123,7 @@ export default function Tasks() {
           </Button>
         </Flex>
       </Flex>
-      <ContainerTasks />
+      <ContainerTasks  />
 
       <Drawer.Root open={openDrawer} onClose={() => setOpenDrawer(false)}>
         <Portal>

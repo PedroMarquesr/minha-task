@@ -2,8 +2,10 @@ import { Flex, Text, Status, Badge } from "@chakra-ui/react"
 import { FcHighPriority } from "react-icons/fc"
 import MenuTask from "../../MenuTask"
 import { useState } from "react"
+import { useStore } from "@/hooks/useStore"
 
 export default function CardTask({
+  id,
   title,
   priority,
   tags,
@@ -11,7 +13,7 @@ export default function CardTask({
   dueDate,
 }) {
   const [showMenu, setShowMenu] = useState(false)
-
+  const { user } = useStore()
   const chooseBorderPriority = (priority) => {
     switch (priority) {
       case "Baixa":
@@ -74,10 +76,20 @@ export default function CardTask({
               {priority?.toUpperCase()}
             </Text>
           </Status.Root>
+          <Text
+            fontWeight={"bold"}
+            fontSize={"xs"}
+            p={1}
+            rounded={"xl"}
+            backgroundColor={"purple.100"}
+            _dark={{ backgroundColor: "purple.400", color: "black" }}
+          >
+            Por: {user.email}
+          </Text>
         </Flex>
 
         <Flex align="center">
-          <MenuTask showMenu={showMenu} />
+          <MenuTask showMenu={showMenu} id={id} />
         </Flex>
       </Flex>
 
