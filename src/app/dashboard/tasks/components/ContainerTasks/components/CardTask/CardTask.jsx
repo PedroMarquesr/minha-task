@@ -103,13 +103,18 @@ export default function CardTask({
         backgroundColor={"gray.300"}
         _dark={{ backgroundColor: "gray.800" }}
       >
-        <Text border={"1px solid red"}>{description}</Text>
+        <Text>{description}</Text>
       </Flex>
       {dueDate && (
-        <Flex>
+        <Flex mt={2}>
           <Text fontWeight={"bold"}>Prazo:</Text>
           <Text pl={2}> {new Date(dueDate).toLocaleDateString()}</Text>
           <Text pl={2}> {new Date(dueDate).toLocaleTimeString()}</Text>
+        </Flex>
+      )}
+      {!dueDate && (
+        <Flex mt={2}>
+          <Text fontWeight={"bold"}>Sem prazo definido</Text>
         </Flex>
       )}
     </Flex>

@@ -20,6 +20,14 @@ export default function ContainerTasks() {
     console.log("Usuário no Zustand:", user)
     console.log("Usuário autenticado no Firebase:", auth.currentUser)
 
+    const sortTasks = (tasks) => {
+      return tasks.sort((a, b) => {
+        const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity
+        const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity
+        return dateA - dateB
+      })
+    }
+
     const unsubscribeTasks = onSnapshot(
       collection(db, "tasks"),
       (querySnapshot) => {
@@ -27,7 +35,7 @@ export default function ContainerTasks() {
         querySnapshot.forEach((doc) => {
           tasksList.push({ id: doc.id, ...doc.data() })
         })
-        setTasks(tasksList)
+        setTasks(sortTasks(tasksList))
       },
       (error) => {
         console.error("Erro ao buscar tarefas:", error)
@@ -42,7 +50,7 @@ export default function ContainerTasks() {
         querySnapshot.forEach((doc) => {
           tasksList.push({ id: doc.id, ...doc.data() })
         })
-        setTasksActive(tasksList)
+        setTasksActive(sortTasks(tasksList))
       },
       (error) => {
         console.error("Erro ao buscar tarefas ativas:", error)
