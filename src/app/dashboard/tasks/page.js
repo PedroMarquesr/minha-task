@@ -26,12 +26,13 @@ import { collection, addDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ContainerTasks from "./components/ContainerTasks/ContainerTasks"
-import { v4 as uuid } from "uuid";
-import { useRouter } from "next/navigation";
-
+import { v4 as uuid } from "uuid"
+import { useRouter } from "next/navigation"
+import { useStore } from "@/hooks/useStore"
 
 export default function Tasks() {
   const router = useRouter()
+  const { user } = useStore()
   const [openDrawer, setOpenDrawer] = useState(false)
   const [task, setTask] = useState({
     id: uuid(),
@@ -47,10 +48,9 @@ export default function Tasks() {
   const [tag, setTag] = useState("")
   const [showAler, setShowAler] = useState(false)
 
-
   const handleAddTag = (tag) => {
     if (tag === "") {
-      return;
+      return
     }
     setTask({ ...task, tags: [...task.tags, tag] })
     setTag("")
@@ -60,10 +60,9 @@ export default function Tasks() {
     setTask({ ...task, tags: task.tags.filter((t) => t !== tag) })
   }
 
-
   const handleSaveTask = async () => {
     const tasksCol = collection(db, "tasks")
-    await addDoc(tasksCol, task);
+    await addDoc(tasksCol, task)
     setOpenDrawer(false)
     setTask({
       title: "",
@@ -73,6 +72,8 @@ export default function Tasks() {
       tags: [],
       dueDate: "",
       isCompleted: false,
+      createdAt: new Date(),
+      userId: user.uid,
     })
     setShowAler(true)
     setTimeout(() => {
@@ -82,14 +83,22 @@ export default function Tasks() {
 
   return (
     <Flex p={10} flexDir={"column"} gap={5}>
-      <AlertCustom description="Tarefa adicionada com sucesso" status={"success"} open={showAler} />
+      <AlertCustom
+        description="Tarefa adicionada com sucesso"
+        status={"success"}
+        open={showAler}
+      />
       <Flex
         align={"center"}
         w={"100%"}
         justifyContent={"space-between"}
         flexDir={{ base: "column", md: "row" }}
       >
-        <Flex flexDir="column" ml={{ base: 0, md: 10 }} align={{ base: "center", md: "start" }} >
+        <Flex
+          flexDir="column"
+          ml={{ base: 0, md: 10 }}
+          align={{ base: "center", md: "start" }}
+        >
           <Text
             fontSize="5xl"
             fontWeight={"bold"}
@@ -102,7 +111,12 @@ export default function Tasks() {
           </Text>{" "}
           {/*Aqui serão informadas as tarefas vigentes*/}
         </Flex>
-        <Flex align={"center"} justify={"center"} w={{ base: "100%", md: "auto" }} mt={{ base: 4, md: 0 }}>
+        <Flex
+          align={"center"}
+          justify={"center"}
+          w={{ base: "100%", md: "auto" }}
+          mt={{ base: 4, md: 0 }}
+        >
           <Button
             w={{ base: "100%", md: "auto" }}
             colorPalette={"purple"}
@@ -111,11 +125,7 @@ export default function Tasks() {
           >
             Adicionar tarefa
           </Button>
-
-
         </Flex>
-
-
       </Flex>
       <ContainerTasks />
 
@@ -133,27 +143,46 @@ export default function Tasks() {
                     <Field.Root>
                       <Stack>
                         <Field.Label>Titulo</Field.Label>
-                        <Input placeholder="Titulo da tarefa" value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} />
+                        <Input
+                          placeholder="Titulo da tarefa"
+                          value={task.title}
+                          onChange={(e) =>
+                            setTask({ ...task, title: e.target.value })
+                          }
+                        />
                       </Stack>
                     </Field.Root>
                     <Field.Root>
                       <Stack>
                         <Field.Label>Descrição</Field.Label>
-                        <Textarea placeholder="Descrição..." value={task.description} onChange={(e) => setTask({ ...task, description: e.target.value })} />
+                        <Textarea
+                          placeholder="Descrição..."
+                          value={task.description}
+                          onChange={(e) =>
+                            setTask({ ...task, description: e.target.value })
+                          }
+                        />
                       </Stack>
                     </Field.Root>
                     <Field.Root>
                       <Stack>
                         <Field.Label>Prioridade</Field.Label>
-                        <NativeSelect.Root defaultValue={"Selecione a prioridade"} onChange={(e) => setTask({ ...task, priority: e.target.value })}>
+                        <NativeSelect.Root
+                          defaultValue={"Selecione a prioridade"}
+                          onChange={(e) =>
+                            setTask({ ...task, priority: e.target.value })
+                          }
+                        >
                           <NativeSelect.Field name="Prioridade">
-                            <For each={[
-                              { label: "Selecione a prioridade", icon: "" },
-                              { label: "Baixa", icon: "🟢" },
-                              { label: "Media", icon: "🟡" },
-                              { label: "Alta", icon: "🟠" },
-                              { label: "Urgente", icon: "🔴" }
-                            ]}>
+                            <For
+                              each={[
+                                { label: "Selecione a prioridade", icon: "" },
+                                { label: "Baixa", icon: "🟢" },
+                                { label: "Media", icon: "🟡" },
+                                { label: "Alta", icon: "🟠" },
+                                { label: "Urgente", icon: "🔴" },
+                              ]}
+                            >
                               {(item) => (
                                 <option key={item.label} value={item.label}>
                                   {item.icon} {item.label}
@@ -165,12 +194,27 @@ export default function Tasks() {
                           <NativeSelect.Indicator />
                         </NativeSelect.Root>
                         <Field.Label>Status</Field.Label>
-                        <NativeSelect.Root defaultValue={"Selecione o status"} onChange={(e) => {
-                          const isCompleted = e.target.value === "Concluido" ? true : false
-                          setTask({ ...task, status: e.target.value, isCompleted })
-                        }} >
+                        <NativeSelect.Root
+                          defaultValue={"Selecione o status"}
+                          onChange={(e) => {
+                            const isCompleted =
+                              e.target.value === "Concluido" ? true : false
+                            setTask({
+                              ...task,
+                              status: e.target.value,
+                              isCompleted,
+                            })
+                          }}
+                        >
                           <NativeSelect.Field name="Status">
-                            <For each={["Selecione o status", "A fazer", "Fazendo", "Concluido"]}>
+                            <For
+                              each={[
+                                "Selecione o status",
+                                "A fazer",
+                                "Fazendo",
+                                "Concluido",
+                              ]}
+                            >
                               {(item) => (
                                 <option key={item} value={item}>
                                   {item}
@@ -187,7 +231,14 @@ export default function Tasks() {
                       <Stack>
                         <Field.Label>Tags</Field.Label>
                         <Flex>
-                          <Input placeholder="Tags da tarefa" value={tag} onChange={(e) => setTag(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAddTag(tag)} />
+                          <Input
+                            placeholder="Tags da tarefa"
+                            value={tag}
+                            onChange={(e) => setTag(e.target.value)}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" && handleAddTag(tag)
+                            }
+                          />
                           <IconButton
                             size="lg"
                             variant="link"
@@ -204,15 +255,22 @@ export default function Tasks() {
                           </IconButton>
                         </Flex>
                         {task.tags.map((tag) => (
-                          <TagTask functionDeleteTag={handleDeleteTag} key={tag} tagTitle={tag} />
+                          <TagTask
+                            functionDeleteTag={handleDeleteTag}
+                            key={tag}
+                            tagTitle={tag}
+                          />
                         ))}
-
                       </Stack>
                     </Field.Root>
 
                     <Field.Root>
                       <Stack>
-                        <Switch.Root colorPalette="purple" checked={hasDueDate} onChange={() => setHasDueDate(!hasDueDate)}>
+                        <Switch.Root
+                          colorPalette="purple"
+                          checked={hasDueDate}
+                          onChange={() => setHasDueDate(!hasDueDate)}
+                        >
                           <Switch.Label>Contém prazo?</Switch.Label>
                           <Switch.HiddenInput />
                           <Switch.Control>
@@ -220,60 +278,67 @@ export default function Tasks() {
                           </Switch.Control>
                         </Switch.Root>
                       </Stack>
-
                     </Field.Root>
 
                     {hasDueDate && (
                       <Field.Root>
                         <Stack>
                           <Field.Label>Prazo</Field.Label>
-                          <Input placeholder="Prazo da tarefa" value={task.dueDate} type="datetime-local" onChange={(e) => setTask({ ...task, dueDate: e.target.value })} />
+                          <Input
+                            placeholder="Prazo da tarefa"
+                            value={task.dueDate}
+                            type="datetime-local"
+                            onChange={(e) =>
+                              setTask({ ...task, dueDate: e.target.value })
+                            }
+                          />
                         </Stack>
                       </Field.Root>
                     )}
-
                   </Fieldset.Content>
                 </Fieldset.Root>
-
               </Drawer.Body>
               <Drawer.Footer>
-                <Button variant="outline" onClick={() => {
-                  setOpenDrawer(false)
-                  setTask({
-                    title: "",
-                    description: "",
-                    priority: "",
-                    status: "",
-                    tags: [],
-                    dueDate: "",
-                  })
-                  setTag("")
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpenDrawer(false)
+                    setTask({
+                      title: "",
+                      description: "",
+                      priority: "",
+                      status: "",
+                      tags: [],
+                      dueDate: "",
+                    })
+                    setTag("")
 
-                  setHasDueDate(false)
-                }}>
+                    setHasDueDate(false)
+                  }}
+                >
                   Cancelar
                 </Button>
-                <Button onClick={() => {
-                  handleSaveTask()
-                  setOpenDrawer(false)
-                  setTask({
-                    title: "",
-                    description: "",
-                    priority: "",
-                    status: "",
-                    tags: [],
-                    dueDate: "",
-                  })
-                  setTag("")
-                  setHasDueDate(false)
-                }}>Salvar</Button>
+                <Button
+                  onClick={() => {
+                    handleSaveTask()
+                    setOpenDrawer(false)
+                    setTask({
+                      title: "",
+                      description: "",
+                      priority: "",
+                      status: "",
+                      tags: [],
+                      dueDate: "",
+                    })
+                    setTag("")
+                    setHasDueDate(false)
+                  }}
+                >
+                  Salvar
+                </Button>
               </Drawer.Footer>
-
-
             </Drawer.Content>
-
           </Drawer.Positioner>
-
         </Portal>
       </Drawer.Root>
     </Flex>
