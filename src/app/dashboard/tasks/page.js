@@ -19,7 +19,7 @@ import {
   Tag,
   Switch,
 } from "@chakra-ui/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FaPlusSquare } from "react-icons/fa"
 import TagTask from "./components/TagTask/TagTask"
 import { collection, addDoc } from "firebase/firestore"
@@ -27,9 +27,11 @@ import { db } from "@/lib/firebase"
 import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ContainerTasks from "./components/ContainerTasks/ContainerTasks"
 import { v4 as uuid } from "uuid";
+import { useRouter } from "next/navigation";
 
 
 export default function Tasks() {
+  const router = useRouter()
   const [openDrawer, setOpenDrawer] = useState(false)
   const [task, setTask] = useState({
     id: uuid(),
@@ -39,6 +41,7 @@ export default function Tasks() {
     status: "",
     tags: [],
     dueDate: "",
+    isCompleted: false,
   })
   const [hasDueDate, setHasDueDate] = useState(false)
   const [tag, setTag] = useState("")
@@ -69,12 +72,14 @@ export default function Tasks() {
       status: "",
       tags: [],
       dueDate: "",
+      isCompleted: false,
     })
     setShowAler(true)
     setTimeout(() => {
       setShowAler(false)
     }, 3000)
   }
+
   return (
     <Flex p={10} flexDir={"column"} gap={5}>
       <AlertCustom description="Tarefa adicionada com sucesso" status={"success"} open={showAler} />
@@ -160,7 +165,10 @@ export default function Tasks() {
                           <NativeSelect.Indicator />
                         </NativeSelect.Root>
                         <Field.Label>Status</Field.Label>
-                        <NativeSelect.Root defaultValue={"Selecione o status"} onChange={(e) => setTask({ ...task, status: e.target.value })} >
+                        <NativeSelect.Root defaultValue={"Selecione o status"} onChange={(e) => {
+                          const isCompleted = e.target.value === "Concluido" ? true : false
+                          setTask({ ...task, status: e.target.value, isCompleted })
+                        }} >
                           <NativeSelect.Field name="Status">
                             <For each={["Selecione o status", "A fazer", "Fazendo", "Concluido"]}>
                               {(item) => (
@@ -212,7 +220,9 @@ export default function Tasks() {
                           </Switch.Control>
                         </Switch.Root>
                       </Stack>
+
                     </Field.Root>
+
                     {hasDueDate && (
                       <Field.Root>
                         <Stack>
@@ -221,8 +231,10 @@ export default function Tasks() {
                         </Stack>
                       </Field.Root>
                     )}
+
                   </Fieldset.Content>
                 </Fieldset.Root>
+
               </Drawer.Body>
               <Drawer.Footer>
                 <Button variant="outline" onClick={() => {

@@ -6,6 +6,8 @@ import { MdModeEdit, MdDelete } from "react-icons/md";
 
 
 export default function MenuTask({ showMenu }) {
+
+
     return (
         <Flex opacity={showMenu ? 1 : 0} h={5} transition={"all 0.2s ease"} gap={2}>
             <Button color="white" bgColor={"green.400"} size={"xsm"}><FaCheck /> </Button>
