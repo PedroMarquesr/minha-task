@@ -30,7 +30,7 @@ export default function SimpleCard({
       <Flex flexDir="row" justifyContent={"space-between"} w={"full"} gap={3} >
         <Flex flexDir="column" p={{ base: 0, md: 5 }} align={{ base: "center", md: "start" }}  >
           <Text textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
-            textAlign={"center"} backgroundColor={{ base: iconColor, _dark: iconColor }} borderRadius={{ base: "none", md: "lg" }} pt={{ base: 3, md: 0 }} >{title}</Text>
+            textAlign={"center"} borderRadius={{ base: "none", md: "lg" }} pt={{ base: 3, md: 0 }} >{title}</Text>
           <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
           >{quantity}</Text>
         </Flex>

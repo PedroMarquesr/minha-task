@@ -57,7 +57,7 @@ export default function ContainerTasks() {
                     <MenuTask />
                 </Flex>
             }
-            <Flex mt={10}><Text fontSize={"lg"} fontWeight={"bold"}>Tarefas abertas</Text></Flex>
+            <Flex mt={10}><Text fontSize={"lg"} fontWeight={"bold"}>Todas as tarefas</Text></Flex>
             < Flex flexDir={"column"} justifyContent={"space-around"} w={"100%"} h={"100%"} >
                 {
                     tasks.map((task) => (
