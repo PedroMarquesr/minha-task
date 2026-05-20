@@ -37,7 +37,7 @@ export default function ContainerTasks() {
       (querySnapshot) => {
         const tasksList = []
         querySnapshot.forEach((doc) => {
-          tasksList.push({ id: doc.id, ...doc.data() })
+          tasksList.push({ ...doc.data(), id: doc.id })
         })
         setTotalTasks(tasksList.length)
         setTasks(sortTasks(tasksList))
@@ -53,7 +53,7 @@ export default function ContainerTasks() {
       (querySnapshot) => {
         const tasksList = []
         querySnapshot.forEach((doc) => {
-          tasksList.push({ id: doc.id, ...doc.data() })
+          tasksList.push({ ...doc.data(), id: doc.id })
         })
         setTotalTasksActive(tasksList.length)
         setTasksActive(sortTasks(tasksList))
@@ -72,7 +72,7 @@ export default function ContainerTasks() {
       (querySnapshot) => {
         const completedTasksList = []
         querySnapshot.forEach((doc) => {
-          completedTasksList.push({ id: doc.id, ...doc.data() })
+          completedTasksList.push({ ...doc.data(), id: doc.id })
         })
         setTotalTasksCompleted(completedTasksList.length)
         setCompletedTasks(sortTasks(completedTasksList))

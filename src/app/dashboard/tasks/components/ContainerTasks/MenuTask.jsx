@@ -1,10 +1,22 @@
 import { Flex, Button } from "@chakra-ui/react"
 import { FaCheck } from "react-icons/fa"
 import { MdModeEdit, MdDelete } from "react-icons/md"
-import { doc, deleteDoc } from "firebase/firestore"
+import { doc, deleteDoc, updateDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
 export default function MenuTask({ showMenu, id }) {
+  const handleCheckTask = async (id) => {
+    try {
+      const taskRef = doc(db, "tasks", id)
+      await updateDoc(taskRef, {
+        isCompleted: true,
+        completedDate: new Date(),
+        status: "Concluído",
+      })
+    } catch (error) {
+      console.error("Erro ao completar a tarefa", error)
+    }
+  }
   const handleDeleteTask = async (id) => {
     try {
       const taskRef = doc(db, "tasks", id)
@@ -16,7 +28,12 @@ export default function MenuTask({ showMenu, id }) {
 
   return (
     <Flex opacity={showMenu ? 1 : 0} h={5} transition={"all 0.2s ease"} gap={2}>
-      <Button color="white" bgColor={"green.400"} size={"xsm"}>
+      <Button
+        color="white"
+        bgColor={"green.400"}
+        size={"xsm"}
+        onClick={() => handleCheckTask(id)}
+      >
         <FaCheck />{" "}
       </Button>
       <Button color="white" bgColor={"orange.400"} size={"xsm"}>
