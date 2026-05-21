@@ -36,8 +36,8 @@ export default function Tasks() {
   const [openDrawer, setOpenDrawer] = useState(false)
   const [task, setTask] = useState({
     id: uuid(),
-    userCreator: user.displayName,
-    userEmail: user.email,
+    userCreator: user?.displayName || "",
+    userEmail: user?.email || "",
     title: "",
     description: "",
     priority: "",
@@ -75,8 +75,8 @@ export default function Tasks() {
     setOpenDrawer(false)
     setTask({
       id: uuid(),
-      userCreator: user.displayName,
-      userEmail: user.email,
+      userCreator: user?.displayName || "",
+      userEmail: user?.email || "",
       title: "",
       description: "",
       priority: "",
