@@ -89,7 +89,7 @@ export default function CardTask({
             backgroundColor={"purple.100"}
             _dark={{ backgroundColor: "purple.400", color: "black" }}
           >
-            Por: {userCreator}
+            Por: {userCreator || userEmail || "Sem nome"}
           </Text>
         </Flex>
 
