@@ -118,6 +118,10 @@ export default function ContainerTasks() {
             tags={task.tags}
             description={task.description}
             dueDate={task.dueDate}
+            userCreator={task.userCreator}
+            userEmail={task.userEmail}
+            isCompleted={task.isCompleted}
+            userCompleted={task.userCompleted}
           />
         ))}
       </Flex>
@@ -140,6 +144,11 @@ export default function ContainerTasks() {
             tags={task.tags}
             description={task.description}
             dueDate={task.dueDate}
+            userCreator={task.userCreator}
+            userEmail={task.userEmail}
+            isCompleted={task.isCompleted}
+            userCompleted={task.userCompleted}
+            completedDate={task?.completedDate}
           />
         ))}
       </Flex>
@@ -163,6 +172,11 @@ export default function ContainerTasks() {
             tags={task.tags}
             description={task.description}
             dueDate={task.dueDate}
+            userCreator={task.userCreator}
+            userEmail={task.userEmail}
+            isCompleted={task.isCompleted}
+            userCompleted={task.userCompleted}
+            completedDate={task?.completedDate}
           />
         ))}
       </Flex>

@@ -11,6 +11,11 @@ export default function CardTask({
   tags,
   description,
   dueDate,
+  userCreator,
+  userEmail,
+  isCompleted,
+  userCompleted,
+  completedDate,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const { user } = useStore()
@@ -84,7 +89,7 @@ export default function CardTask({
             backgroundColor={"purple.100"}
             _dark={{ backgroundColor: "purple.400", color: "black" }}
           >
-            Por: {user.email}
+            Por: {userCreator}
           </Text>
         </Flex>
 
@@ -127,6 +132,28 @@ export default function CardTask({
       {!dueDate && (
         <Flex mt={2}>
           <Text fontWeight={"bold"}>Sem prazo definido</Text>
+        </Flex>
+      )}
+      {isCompleted && completedDate && (
+        <Flex
+          mt={2}
+          align="center"
+          flexWrap="wrap"
+          gap={1}
+          backgroundColor={"blue.100"}
+          _dark={{ backgroundColor: "blue.400", color: "black" }}
+          p={1}
+          rounded={"lg"}
+        >
+          <Text fontSize={"xs"}>Concluída por: {userCompleted} em</Text>
+          <Text fontSize={"xs"} fontWeight={"bold"}>
+            {completedDate?.toDate
+              ? completedDate.toDate().toLocaleDateString()
+              : new Date(completedDate).toLocaleDateString()} -{" "}
+            {completedDate?.toDate
+              ? completedDate.toDate().toLocaleTimeString()
+              : new Date(completedDate).toLocaleTimeString()}
+          </Text>
         </Flex>
       )}
     </Flex>

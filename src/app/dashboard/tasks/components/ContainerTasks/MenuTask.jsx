@@ -3,8 +3,10 @@ import { FaCheck } from "react-icons/fa"
 import { MdModeEdit, MdDelete } from "react-icons/md"
 import { doc, deleteDoc, updateDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { useStore } from "@/hooks/useStore"
 
 export default function MenuTask({ showMenu, id }) {
+  const { user } = useStore()
   const handleCheckTask = async (id) => {
     try {
       const taskRef = doc(db, "tasks", id)
@@ -12,6 +14,7 @@ export default function MenuTask({ showMenu, id }) {
         isCompleted: true,
         completedDate: new Date(),
         status: "Concluído",
+        userCompleted: user.displayName,
       })
     } catch (error) {
       console.error("Erro ao completar a tarefa", error)

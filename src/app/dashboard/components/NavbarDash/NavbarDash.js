@@ -32,7 +32,7 @@ export default function NavBarDash({ setOpenMenu }) {
       p={2}
       boxShadow={"lg"}
     >
-      <Link href="/">
+      <Link href={user ? "/dashboard" : "/"}>
         <Flex flexDir="row" gap={2} alignItems="center">
           <Icon size="lg" as={TfiAgenda} />
           <Text fontWeight="bold">MinhaTask</Text>

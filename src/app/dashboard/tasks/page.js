@@ -36,6 +36,8 @@ export default function Tasks() {
   const [openDrawer, setOpenDrawer] = useState(false)
   const [task, setTask] = useState({
     id: uuid(),
+    userCreator: user.displayName,
+    userEmail: user.email,
     title: "",
     description: "",
     priority: "",
@@ -62,9 +64,19 @@ export default function Tasks() {
 
   const handleSaveTask = async () => {
     const tasksCol = collection(db, "tasks")
-    await addDoc(tasksCol, task)
+    const newTask = {
+      ...task,
+      userCreator: user?.displayName,
+      userEmail: user?.email,
+      createdAt: new Date(),
+      userId: user?.uid,
+    }
+    await addDoc(tasksCol, newTask)
     setOpenDrawer(false)
     setTask({
+      id: uuid(),
+      userCreator: user.displayName,
+      userEmail: user.email,
       title: "",
       description: "",
       priority: "",
@@ -72,8 +84,6 @@ export default function Tasks() {
       tags: [],
       dueDate: "",
       isCompleted: false,
-      createdAt: new Date(),
-      userId: user.uid,
     })
     setShowAler(true)
     setTimeout(() => {
@@ -123,7 +133,7 @@ export default function Tasks() {
           </Button>
         </Flex>
       </Flex>
-      <ContainerTasks  />
+      <ContainerTasks />
 
       <Drawer.Root open={openDrawer} onClose={() => setOpenDrawer(false)}>
         <Portal>
@@ -300,15 +310,18 @@ export default function Tasks() {
                   onClick={() => {
                     setOpenDrawer(false)
                     setTask({
+                      id: uuid(),
+                      userCreator: user?.displayName,
+                      userEmail: user?.email,
                       title: "",
                       description: "",
                       priority: "",
                       status: "",
                       tags: [],
                       dueDate: "",
+                      isCompleted: false,
                     })
                     setTag("")
-
                     setHasDueDate(false)
                   }}
                 >
@@ -317,15 +330,6 @@ export default function Tasks() {
                 <Button
                   onClick={() => {
                     handleSaveTask()
-                    setOpenDrawer(false)
-                    setTask({
-                      title: "",
-                      description: "",
-                      priority: "",
-                      status: "",
-                      tags: [],
-                      dueDate: "",
-                    })
                     setTag("")
                     setHasDueDate(false)
                   }}
