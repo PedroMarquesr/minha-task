@@ -4,30 +4,49 @@ import { FcGoogle } from "react-icons/fc"
 import { useStore } from "@/hooks/useStore"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
+import { collection, query, where, getDocs } from "firebase/firestore"
+import { db } from "@/lib/firebase"
 
 export default function GoogleButton() {
   const provider = new GoogleAuthProvider()
   const { user, setUser } = useStore()
   const router = useRouter()
 
-  const handleLoginGoogle = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result)
-        const token = credential.accessToken
-        // The signed-in user info.
-        const loggedUser = result.user
+  const findUserCompany = async (uid) => {
+    const q = query(
+      collection(db, "companies"),
+      where("members", "array-contains", uid),
+    )
 
-        setUser(loggedUser)
-        router.push("/dashboard")
+    const snapshot = await getDocs(q)
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0]
+      return { id: doc.id, ...doc.data() }
+    }
+    return null
+  }
+
+  const handleLoginGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider)
+      const loggedUser = result.user
+
+      // Busca a empresa do usuário
+      const company = await findUserCompany(loggedUser.uid)
+
+      // Salva usuário + empresa no store
+      setUser({
+        ...loggedUser,
+        companyId: company?.id || null,
+        role: company?.roles?.[loggedUser.uid] || "member",
       })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code
-        const errorMessage = error.message
-        console.error("Erro:", errorMessage)
-      })
+      console.log("Empresa encontrada:", company)
+      console.log("Role do usuário:", company?.roles?.[loggedUser.uid])
+      console.log("Empresa", company)
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Erro:", error.message)
+    }
   }
 
   return (
