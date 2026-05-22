@@ -31,9 +31,13 @@ export default function ContainerTasks() {
         return dateA - dateB
       })
     }
-    //Total Tasks Active
-    const unsubscribeTasks = onSnapshot(
+    // Total Tasks Active
+    const allTasksQuery = query(
       collection(db, "tasks"),
+      where("companyId", "==", user.companyId),
+    )
+    const unsubscribeTasks = onSnapshot(
+      allTasksQuery,
       (querySnapshot) => {
         const tasksList = []
         querySnapshot.forEach((doc) => {
@@ -46,8 +50,29 @@ export default function ContainerTasks() {
         console.error("Erro ao buscar tarefas:", error)
       },
     )
+
+    // const unsubscribeTasks = onSnapshot(
+    //   collection(db, "tasks"),
+    //   where("companyId", "==", user.companyId),
+    //   (querySnapshot) => {
+    //     const tasksList = []
+    //     querySnapshot.forEach((doc) => {
+    //       tasksList.push({ ...doc.data(), id: doc.id })
+    //     })
+    //     setTotalTasks(tasksList.length)
+    //     setTasks(sortTasks(tasksList))
+    //   },
+    //   (error) => {
+    //     console.error("Erro ao buscar tarefas:", error)
+    //   },
+    // )
+
     // Tarefas A Fazer
-    const q = query(collection(db, "tasks"), where("status", "==", "A fazer"))
+    const q = query(
+      collection(db, "tasks"),
+      where("status", "==", "A fazer"),
+      where("companyId", "==", user.companyId),
+    )
     const unsubscribeActiveTasks = onSnapshot(
       q,
       (querySnapshot) => {
@@ -66,6 +91,7 @@ export default function ContainerTasks() {
     const qCompleted = query(
       collection(db, "tasks"),
       where("isCompleted", "==", true),
+      where("companyId", "==", user?.companyId),
     )
     const unsubscribeCompletedTasks = onSnapshot(
       qCompleted,
@@ -127,7 +153,9 @@ export default function ContainerTasks() {
       </Flex>
 
       <Flex mt={10}>
-        <Text>Concluídas: {totalTasksCompleted}</Text>
+        <Text fontSize={"lg"} fontWeight={"bold"}>
+          Concluídas: {totalTasksCompleted}
+        </Text>
       </Flex>
       <Flex
         flexDir={"column"}

@@ -70,6 +70,7 @@ export default function Tasks() {
       userEmail: user?.email,
       createdAt: new Date(),
       userId: user?.uid,
+      companyId: user?.companyId,
     }
     await addDoc(tasksCol, newTask)
     setOpenDrawer(false)
