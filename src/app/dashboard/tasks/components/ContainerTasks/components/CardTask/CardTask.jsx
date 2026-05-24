@@ -1,6 +1,7 @@
 import { Flex, Text, Status, Badge } from "@chakra-ui/react"
 import { FcHighPriority } from "react-icons/fc"
 import MenuTask from "../../MenuTask"
+import MenuTaskMb from "../../MenuTaskMb"
 import { useState } from "react"
 import { useStore } from "@/hooks/useStore"
 
@@ -16,6 +17,7 @@ export default function CardTask({
   isCompleted,
   userCompleted,
   completedDate,
+  createdAt,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const { user } = useStore()
@@ -81,16 +83,7 @@ export default function CardTask({
               {priority?.toUpperCase()}
             </Text>
           </Status.Root>
-          <Text
-            fontWeight={"bold"}
-            fontSize={"xs"}
-            p={1}
-            rounded={"xl"}
-            backgroundColor={"purple.100"}
-            _dark={{ backgroundColor: "purple.400", color: "black" }}
-          >
-            Por: {userCreator || userEmail || "Sem nome"}
-          </Text>
+
         </Flex>
 
         <Flex align="center">
@@ -134,6 +127,32 @@ export default function CardTask({
           <Text fontWeight={"bold"}>Sem prazo definido</Text>
         </Flex>
       )}
+
+      <Flex
+        mt={2}
+
+        flexWrap="wrap"
+        gap={1}
+        flexDir={{ base: "column", md: "row" }}
+        backgroundColor={"blue.100"}
+        _dark={{ backgroundColor: "purple.400", color: "black" }}
+        p={1}
+        rounded={"lg"}
+      >
+
+        <Text fontSize={"xs"}>Criada por: {userCreator || userEmail || "Sem nome"} em</Text>
+        <Text fontSize={"xs"} fontWeight={"bold"}>
+          {createdAt?.toDate
+            ? createdAt.toDate().toLocaleDateString()
+            : new Date(createdAt).toLocaleDateString()} -{" "}
+          {createdAt?.toDate
+            ? createdAt.toDate().toLocaleTimeString()
+            : new Date(createdAt).toLocaleTimeString()}
+        </Text>
+
+      </Flex>
+
+
       {isCompleted && completedDate && (
         <Flex
           mt={2}
@@ -145,6 +164,7 @@ export default function CardTask({
           p={1}
           rounded={"lg"}
         >
+
           <Text fontSize={"xs"}>Concluída por: {userCompleted} em</Text>
           <Text fontSize={"xs"} fontWeight={"bold"}>
             {completedDate?.toDate
@@ -156,6 +176,7 @@ export default function CardTask({
           </Text>
         </Flex>
       )}
+      <MenuTaskMb id={id} />
     </Flex>
   )
 }

@@ -30,7 +30,7 @@ export default function MenuTask({ showMenu, id }) {
   }
 
   return (
-    <Flex opacity={showMenu ? 1 : 0} h={5} transition={"all 0.2s ease"} gap={2}>
+    <Flex opacity={showMenu ? 1 : 0} display={{ base: "none", md: "flex" }} h={5} transition={"all 0.2s ease"} gap={2}>
       <Button
         color="white"
         bgColor={"green.400"}
@@ -39,9 +39,7 @@ export default function MenuTask({ showMenu, id }) {
       >
         <FaCheck />{" "}
       </Button>
-      <Button color="white" bgColor={"orange.400"} size={"xsm"}>
-        <MdModeEdit />{" "}
-      </Button>
+
       <Button
         color="white"
         bgColor={"red.400"}

@@ -51,21 +51,7 @@ export default function ContainerTasks() {
       },
     )
 
-    // const unsubscribeTasks = onSnapshot(
-    //   collection(db, "tasks"),
-    //   where("companyId", "==", user.companyId),
-    //   (querySnapshot) => {
-    //     const tasksList = []
-    //     querySnapshot.forEach((doc) => {
-    //       tasksList.push({ ...doc.data(), id: doc.id })
-    //     })
-    //     setTotalTasks(tasksList.length)
-    //     setTasks(sortTasks(tasksList))
-    //   },
-    //   (error) => {
-    //     console.error("Erro ao buscar tarefas:", error)
-    //   },
-    // )
+
 
     // Tarefas A Fazer
     const q = query(
@@ -148,6 +134,7 @@ export default function ContainerTasks() {
             userEmail={task.userEmail}
             isCompleted={task.isCompleted}
             userCompleted={task.userCompleted}
+            createdAt={task.createdAt}
           />
         ))}
       </Flex>
@@ -177,6 +164,8 @@ export default function ContainerTasks() {
             isCompleted={task.isCompleted}
             userCompleted={task.userCompleted}
             completedDate={task?.completedDate}
+            createdAt={task.createdAt}
+
           />
         ))}
       </Flex>
@@ -205,6 +194,8 @@ export default function ContainerTasks() {
             isCompleted={task.isCompleted}
             userCompleted={task.userCompleted}
             completedDate={task?.completedDate}
+            createdAt={task.createdAt}
+
           />
         ))}
       </Flex>
