@@ -1,26 +1,23 @@
 // firebase-messaging-sw.js
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js",
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js",
 )
-
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js",
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js",
 )
 
 firebase.initializeApp({
-  apiKey: "SUA_API_KEY",
-  authDomain: "SUA_AUTH_DOMAIN",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE_BUCKET",
-  messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-  appId: "SEU_APP_ID",
+  apiKey: "AIzaSyAf3jfszEYRi9dXju2FS-yOUDEkw4OAU0E",
+  authDomain: "minha-task-pm.firebaseapp.com",
+  projectId: "minha-task-pm",
+  storageBucket: "minha-task-pm.firebasestorage.app",
+  messagingSenderId: "991926162185",
+  appId: "1:991926162185:web:38c14e153bfa29a34439d8",
 })
 
 const messaging = firebase.messaging()
 
 messaging.onBackgroundMessage((payload) => {
-  console.log("Mensagem recebida:", payload)
-
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
     icon: "/icon.png",
