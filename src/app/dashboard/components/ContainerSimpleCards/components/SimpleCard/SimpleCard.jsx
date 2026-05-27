@@ -50,6 +50,7 @@ export default function SimpleCard({
           >
             {title}
           </Text>
+
           <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)">
             {quantity}
           </Text>

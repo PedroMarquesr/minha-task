@@ -83,7 +83,6 @@ export default function CardTask({
               {priority?.toUpperCase()}
             </Text>
           </Status.Root>
-
         </Flex>
 
         <Flex align="center">
@@ -118,8 +117,16 @@ export default function CardTask({
       {dueDate && (
         <Flex mt={2}>
           <Text fontWeight={"bold"}>Prazo:</Text>
-          <Text pl={2}> {new Date(dueDate).toLocaleDateString()}</Text>
-          <Text pl={2}> {new Date(dueDate).toLocaleTimeString()}</Text>
+          <Text pl={2}>
+            {dueDate?.toDate
+              ? dueDate.toDate().toLocaleDateString()
+              : new Date(dueDate).toLocaleDateString()}
+          </Text>
+          <Text pl={2}>
+            {dueDate?.toDate
+              ? dueDate.toDate().toLocaleTimeString()
+              : new Date(dueDate).toLocaleTimeString()}
+          </Text>
         </Flex>
       )}
       {!dueDate && (
@@ -130,7 +137,6 @@ export default function CardTask({
 
       <Flex
         mt={2}
-
         flexWrap="wrap"
         gap={1}
         flexDir={{ base: "column", md: "row" }}
@@ -139,19 +145,19 @@ export default function CardTask({
         p={1}
         rounded={"lg"}
       >
-
-        <Text fontSize={"xs"}>Criada por: {userCreator || userEmail || "Sem nome"} em</Text>
+        <Text fontSize={"xs"}>
+          Criada por: {userCreator || userEmail || "Sem nome"} em
+        </Text>
         <Text fontSize={"xs"} fontWeight={"bold"}>
           {createdAt?.toDate
             ? createdAt.toDate().toLocaleDateString()
-            : new Date(createdAt).toLocaleDateString()} -{" "}
+            : new Date(createdAt).toLocaleDateString()}{" "}
+          -{" "}
           {createdAt?.toDate
             ? createdAt.toDate().toLocaleTimeString()
             : new Date(createdAt).toLocaleTimeString()}
         </Text>
-
       </Flex>
-
 
       {isCompleted && completedDate && (
         <Flex
@@ -164,12 +170,12 @@ export default function CardTask({
           p={1}
           rounded={"lg"}
         >
-
           <Text fontSize={"xs"}>Concluída por: {userCompleted} em</Text>
           <Text fontSize={"xs"} fontWeight={"bold"}>
             {completedDate?.toDate
               ? completedDate.toDate().toLocaleDateString()
-              : new Date(completedDate).toLocaleDateString()} -{" "}
+              : new Date(completedDate).toLocaleDateString()}{" "}
+            -{" "}
             {completedDate?.toDate
               ? completedDate.toDate().toLocaleTimeString()
               : new Date(completedDate).toLocaleTimeString()}

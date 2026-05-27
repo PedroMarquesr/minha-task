@@ -19,7 +19,7 @@ export default function ContainerSimpleCards({ linkTasks }) {
   // Tarefas ativas
   useEffect(() => {
     if (!user) return
-    console.log("Iniciando busca de tarefas ativas para company:", user.companyId)
+
     const q = query(
       collection(db, "tasks"),
       where("status", "==", "A fazer"),
@@ -29,7 +29,6 @@ export default function ContainerSimpleCards({ linkTasks }) {
     const unsubscribe = onSnapshot(
       q,
       (querySnapshot) => {
-        console.log("Tarefas ativas encontradas pelo snapshot:", querySnapshot.docs.length)
         setActiveTasksCount(querySnapshot.docs.length)
       },
       (error) => {
@@ -43,13 +42,33 @@ export default function ContainerSimpleCards({ linkTasks }) {
   // Vencendo hoje
   useEffect(() => {
     if (!user) return
-    const today = new Date().toDateString()
+
+    const today = new Date()
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      0,
+      0,
+      0,
+    )
+    const endOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      59,
+      59,
+    )
+
     const q = query(
       collection(db, "tasks"),
-      where("dueDate", "==", today),
+      where("dueDate", ">=", startOfDay),
+      where("dueDate", "<=", endOfDay),
       where("status", "==", "A fazer"),
       where("companyId", "==", user.companyId),
     )
+
     const unsubscribe = onSnapshot(
       q,
       (querySnapshot) => {
@@ -59,6 +78,7 @@ export default function ContainerSimpleCards({ linkTasks }) {
         console.error("Erro ao buscar tarefas vencendo hoje:", error)
       },
     )
+
     return () => unsubscribe()
   }, [user])
 
@@ -92,7 +112,7 @@ export default function ContainerSimpleCards({ linkTasks }) {
         quantity={
           tasksExpiringTodayCount !== null ? (
             tasksExpiringTodayCount === 0 ? (
-              "Nenhuma"
+              0
             ) : (
               tasksExpiringTodayCount
             )

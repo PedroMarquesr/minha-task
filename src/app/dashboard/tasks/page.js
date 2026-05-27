@@ -30,7 +30,6 @@ import { v4 as uuid } from "uuid"
 import { useRouter } from "next/navigation"
 import { useStore } from "@/hooks/useStore"
 
-
 export default function Tasks() {
   const router = useRouter()
   const { user } = useStore()
@@ -72,6 +71,7 @@ export default function Tasks() {
       createdAt: new Date(),
       userId: user?.uid,
       companyId: user?.companyId,
+      dueDate: task.dueDate ? new Date(task.dueDate) : null,
     }
     await addDoc(tasksCol, newTask)
     setOpenDrawer(false)
