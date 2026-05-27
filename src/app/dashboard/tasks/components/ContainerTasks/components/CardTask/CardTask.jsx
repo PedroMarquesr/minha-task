@@ -18,6 +18,7 @@ export default function CardTask({
   userCompleted,
   completedDate,
   createdAt,
+  status,
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const { user } = useStore()
@@ -86,7 +87,7 @@ export default function CardTask({
         </Flex>
 
         <Flex align="center">
-          <MenuTask showMenu={showMenu} id={id} />
+          <MenuTask showMenu={showMenu} id={id} semanticButton={status} />
         </Flex>
       </Flex>
 

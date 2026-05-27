@@ -16,6 +16,8 @@ export default function ContainerTasks() {
   const [totalTasksActive, setTotalTasksActive] = useState(0)
   const [totalTasksCompleted, setTotalTasksCompleted] = useState(0)
   const [completedTasks, setCompletedTasks] = useState([])
+  const [inProgressTasks, setInProgressTasks] = useState([])
+  const [totalTasksInProgress, setTotalTasksInProgress] = useState(0)
 
   useEffect(() => {
     if (!user) return
@@ -48,6 +50,27 @@ export default function ContainerTasks() {
       },
       (error) => {
         console.error("Erro ao buscar tarefas:", error)
+      },
+    )
+    // Tarefas em Andamento
+    const qinProgress = query(
+      collection(db, "tasks"),
+      where("status", "==", "Fazendo"),
+      where("companyId", "==", user.companyId),
+    )
+
+    const unsubscribeInProgressTasks = onSnapshot(
+      qinProgress,
+      (querySnapshot) => {
+        const inProgressTasksList = []
+        querySnapshot.forEach((doc) => {
+          inProgressTasksList.push({ ...doc.data(), id: doc.id })
+        })
+        setInProgressTasks(sortTasks(inProgressTasksList))
+        setTotalTasksInProgress(inProgressTasksList.length)
+      },
+      (error) => {
+        console.error("Erro ao buscar tarefas em andamento:", error)
       },
     )
 
@@ -93,6 +116,7 @@ export default function ContainerTasks() {
       unsubscribeTasks()
       unsubscribeActiveTasks()
       unsubscribeCompletedTasks()
+      unsubscribeInProgressTasks()
     }
   }, [user])
 
@@ -108,7 +132,35 @@ export default function ContainerTasks() {
           <Text>Faça login para adicionar tarefas</Text>
         </Flex>
       )}
-
+      <Flex mt={10}>
+        <Text fontSize={"lg"} fontWeight={"bold"}>
+          Em andamento: {totalTasksInProgress}
+        </Text>
+      </Flex>
+      <Flex
+        flexDir={"column"}
+        justifyContent={"space-around"}
+        w={"100%"}
+        h={"100%"}
+      >
+        {inProgressTasks.map((task) => (
+          <CardTask
+            key={task.id}
+            id={task.id}
+            title={task.title}
+            priority={task.priority}
+            tags={task.tags}
+            description={task.description}
+            dueDate={task.dueDate}
+            userCreator={task.userCreator}
+            userEmail={task.userEmail}
+            isCompleted={task.isCompleted}
+            userCompleted={task.userCompleted}
+            createdAt={task.createdAt}
+            status={task.status}
+          />
+        ))}
+      </Flex>
       <Flex mt={10}>
         <Text fontSize={"lg"} fontWeight={"bold"}>
           Pendentes: {totalTasksActive}
@@ -134,6 +186,7 @@ export default function ContainerTasks() {
             isCompleted={task.isCompleted}
             userCompleted={task.userCompleted}
             createdAt={task.createdAt}
+            status={task.status}
           />
         ))}
       </Flex>
@@ -164,6 +217,7 @@ export default function ContainerTasks() {
             userCompleted={task.userCompleted}
             completedDate={task?.completedDate}
             createdAt={task.createdAt}
+            status={task.status}
           />
         ))}
       </Flex>

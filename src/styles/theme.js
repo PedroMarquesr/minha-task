@@ -1,4 +1,4 @@
-import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
 
 const config = defineConfig({
   theme: {
@@ -23,13 +23,13 @@ const config = defineConfig({
       },
       animations: {
         shimmer: {
-          value: "shimmer 0.65s ease forwards", 
+          value: "shimmer 0.65s ease forwards",
         },
       },
       keyframes: {
         shimmer: {
           value: {
-            "0%":   { left: "-80%" },
+            "0%": { left: "-80%" },
             "100%": { left: "140%" },
           },
         },
@@ -39,7 +39,7 @@ const config = defineConfig({
     semanticTokens: {
       colors: {
         bgApp: {
-          value: { base: "#f7fafc", _dark: "#1a202c" },
+          value: { base: "#f7fafc", _dark: "#151d2dff" },
         },
         textApp: {
           value: { base: "#2d3748", _dark: "#e2e8f0" },
@@ -64,7 +64,8 @@ const config = defineConfig({
                 left: "-80%",
                 width: "50%",
                 height: "100%",
-                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
                 transform: "skewX(-20deg)",
               },
               _hover: {
@@ -76,9 +77,8 @@ const config = defineConfig({
           },
         },
       },
-      
     },
   },
-});
+})
 
-export const system = createSystem(defaultConfig, config);
+export const system = createSystem(defaultConfig, config)

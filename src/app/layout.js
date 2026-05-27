@@ -2,7 +2,7 @@
 
 import { Provider } from "@/components/ui/provider"
 import { Jost, DM_Serif_Display } from "next/font/google"
-
+import { Box } from "@chakra-ui/react"
 
 const jost = Jost({
   subsets: ["latin"],
@@ -19,7 +19,11 @@ export default function RootLayout({ children }) {
   return (
     <html suppressHydrationWarning className={`${jost.variable} ${dmSerif.variable}`}>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          <Box bg="bgApp" minH="100vh">
+            {children}
+          </Box>
+        </Provider>
       </body>
     </html>
   )
