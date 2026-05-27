@@ -9,7 +9,7 @@ export default function Dashboard() {
   return (
     <Flex p={4} flexDir="column" gap={5}>
       <Text fontSize="2xl">Dashboard Home</Text>
-      <ContainerSimpleCards />
+      <ContainerSimpleCards linkTasks="/dashboard/tasks" />
     </Flex>
   )
 }

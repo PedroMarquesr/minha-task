@@ -13,9 +13,9 @@ export default function NotificationPermission() {
         const token = await getToken(messaging, {
           vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
         })
+        console.log("Token:", token)
       }
     }
-
     requestPermission()
   }, [])
 

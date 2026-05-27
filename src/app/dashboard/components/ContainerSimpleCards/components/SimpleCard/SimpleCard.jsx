@@ -1,5 +1,6 @@
 "use client"
-import { Flex, Text, Icon } from "@chakra-ui/react"
+import { Flex, Text, Icon, Link } from "@chakra-ui/react"
+import { useRouter } from "next/navigation"
 
 export default function SimpleCard({
   title,
@@ -7,9 +8,15 @@ export default function SimpleCard({
   quantity,
   iconColor,
   bgIconColor,
+  linkCard,
 }) {
+  const router = useRouter()
+  const hadleClick = (linkCard) => {
+    router.push(linkCard)
+  }
   return (
     <Flex
+      onClick={() => hadleClick(linkCard)}
       flexDir="row"
       gap={5}
       shadow={"base"}
@@ -24,15 +31,28 @@ export default function SimpleCard({
         borderColor: "purple.400",
         transform: "translateY(-2px)",
         transition: "all 0.3s ease",
-        cursor: "pointer"
+        cursor: "pointer",
       }}
+      // as={Link}
+      // href={linkCard}
     >
-      <Flex flexDir="row" justifyContent={"space-between"} w={"full"} gap={3} >
-        <Flex flexDir="column" p={{ base: 0, md: 5 }} align={{ base: "center", md: "start" }}  >
-          <Text textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
-            textAlign={"center"} borderRadius={{ base: "none", md: "lg" }} pt={{ base: 3, md: 0 }} >{title}</Text>
-          <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
-          >{quantity}</Text>
+      <Flex flexDir="row" justifyContent={"space-between"} w={"full"} gap={3}>
+        <Flex
+          flexDir="column"
+          p={{ base: 0, md: 5 }}
+          align={{ base: "center", md: "start" }}
+        >
+          <Text
+            textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
+            textAlign={"center"}
+            borderRadius={{ base: "none", md: "lg" }}
+            pt={{ base: 3, md: 0 }}
+          >
+            {title}
+          </Text>
+          <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)">
+            {quantity}
+          </Text>
         </Flex>
 
         <Flex
@@ -49,7 +69,7 @@ export default function SimpleCard({
             px={7}
             borderLeftRadius={"lg"}
           >
-            <Icon fontSize={"4xl"} color={iconColor} >
+            <Icon fontSize={"4xl"} color={iconColor}>
               {icon}
             </Icon>
           </Flex>

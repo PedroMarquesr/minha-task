@@ -51,8 +51,6 @@ export default function ContainerTasks() {
       },
     )
 
-
-
     // Tarefas A Fazer
     const q = query(
       collection(db, "tasks"),
@@ -97,6 +95,7 @@ export default function ContainerTasks() {
       unsubscribeCompletedTasks()
     }
   }, [user])
+
   return (
     <>
       {user ? null : (
@@ -165,7 +164,6 @@ export default function ContainerTasks() {
             userCompleted={task.userCompleted}
             completedDate={task?.completedDate}
             createdAt={task.createdAt}
-
           />
         ))}
       </Flex>
@@ -195,7 +193,6 @@ export default function ContainerTasks() {
             userCompleted={task.userCompleted}
             completedDate={task?.completedDate}
             createdAt={task.createdAt}
-
           />
         ))}
       </Flex>

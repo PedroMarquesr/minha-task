@@ -1,13 +1,67 @@
 "use client"
-import { Flex } from "@chakra-ui/react"
+import { Flex, Spinner, Link } from "@chakra-ui/react"
 import SimpleCard from "./components/SimpleCard/SimpleCard"
 import { FiAlertTriangle } from "react-icons/fi"
 import { CiSquareCheck } from "react-icons/ci"
 import { FaRegCalendar } from "react-icons/fa6"
 import { MdBalance } from "react-icons/md"
 import { FaRegSquareCheck } from "react-icons/fa6"
+import { useState, useEffect } from "react"
+import { useStore } from "@/hooks/useStore"
+import { db } from "@/lib/firebase"
+import { collection, query, where, onSnapshot } from "firebase/firestore"
 
-export default function ContainerSimpleCards() {
+export default function ContainerSimpleCards({ linkTasks }) {
+  const [activeTasksCount, setActiveTasksCount] = useState(null)
+  const [tasksExpiringTodayCount, setTasksExpiringTodayCount] = useState(null)
+  const { user } = useStore()
+
+  // Tarefas ativas
+  useEffect(() => {
+    if (!user) return
+    console.log("Iniciando busca de tarefas ativas para company:", user.companyId)
+    const q = query(
+      collection(db, "tasks"),
+      where("status", "==", "A fazer"),
+      where("companyId", "==", user.companyId),
+    )
+
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        console.log("Tarefas ativas encontradas pelo snapshot:", querySnapshot.docs.length)
+        setActiveTasksCount(querySnapshot.docs.length)
+      },
+      (error) => {
+        console.error("Erro ao buscar tarefas ativas:", error)
+      },
+    )
+
+    return () => unsubscribe()
+  }, [user])
+
+  // Vencendo hoje
+  useEffect(() => {
+    if (!user) return
+    const today = new Date().toDateString()
+    const q = query(
+      collection(db, "tasks"),
+      where("dueDate", "==", today),
+      where("status", "==", "A fazer"),
+      where("companyId", "==", user.companyId),
+    )
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        setTasksExpiringTodayCount(querySnapshot.docs.length)
+      },
+      (error) => {
+        console.error("Erro ao buscar tarefas vencendo hoje:", error)
+      },
+    )
+    return () => unsubscribe()
+  }, [user])
+
   const chooseIcon = (type) => {
     switch (type) {
       case "tarefas abertas":
@@ -27,17 +81,29 @@ export default function ContainerSimpleCards() {
     <Flex gap={5} justifyContent={"space-evenly"}>
       <SimpleCard
         title={"Tarefas abertas"}
-        quantity={"10"}
+        quantity={activeTasksCount !== null ? activeTasksCount : <Spinner />}
         icon={chooseIcon("tarefas abertas")}
         iconColor={{ base: "green.400", _dark: "green.100" }}
         bgIconColor={{ base: "green.100", _dark: "green.400" }}
+        linkCard={"/dashboard/tasks"}
       />
       <SimpleCard
         title={"Vencendo hoje"}
-        quantity={"10"}
+        quantity={
+          tasksExpiringTodayCount !== null ? (
+            tasksExpiringTodayCount === 0 ? (
+              "Nenhuma"
+            ) : (
+              tasksExpiringTodayCount
+            )
+          ) : (
+            <Spinner />
+          )
+        }
         icon={chooseIcon("vencendo hoje")}
         iconColor={{ base: "red.400", _dark: "red.100" }}
         bgIconColor={{ base: "red.100", _dark: "red.400" }}
+        linkCard={"/dashboard/tasks"}
       />
       <SimpleCard
         title={"Próximos 7 dias"}
