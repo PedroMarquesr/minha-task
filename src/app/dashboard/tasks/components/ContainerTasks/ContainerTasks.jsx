@@ -1,15 +1,85 @@
-import { Flex, Text, Accordion, Button, Span } from "@chakra-ui/react"
+import { Flex, Text, Accordion } from "@chakra-ui/react"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { useState, useEffect } from "react"
 import { getAuth } from "firebase/auth"
-import AccordionDefault from "./components/AccordionDefault/AccordionDefault"
-import { FaChevronDown } from "react-icons/fa";
-
+import { FaPlay, FaClock, FaCheck, FaListUl } from "react-icons/fa"
 
 import { useStore } from "@/hooks/useStore"
 import { db } from "@/lib/firebase"
 import CardTask from "./components/CardTask/CardTask"
-import MenuTask from "./MenuTask"
+
+const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, tasks }) => (
+  <Accordion.Item
+    value={value}
+    bg="white"
+    _dark={{ bg: "gray.800", borderColor: "gray.700" }}
+    borderRadius="xl"
+    boxShadow="sm"
+    border="1px solid"
+    borderColor="gray.200"
+    overflow="hidden"
+    mb={4}
+  >
+    <Accordion.ItemTrigger
+      px={{ base: 4, md: 6 }}
+      py={4}
+      _hover={{ bg: "gray.50", _dark: { bg: "whiteAlpha.50" } }}
+      transition="all 0.2s"
+      cursor="pointer"
+    >
+      <Flex alignItems="center" w="100%" justifyContent="space-between">
+        <Flex alignItems="center" gap={4}>
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            w={10}
+            h={10}
+            borderRadius="full"
+            bg={`${colorScheme}.100`}
+            color={`${colorScheme}.600`}
+            _dark={{ bg: `${colorScheme}.900`, color: `${colorScheme}.200` }}
+          >
+            <IconComponent size={18} />
+          </Flex>
+          <Text fontSize="lg" fontWeight="semibold" color="gray.800" _dark={{ color: "gray.100" }}>
+            {title}
+          </Text>
+        </Flex>
+
+        <Flex alignItems="center" gap={4}>
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            px={3}
+            py={1}
+            borderRadius="full"
+            bg="gray.100"
+            color="gray.700"
+            fontWeight="bold"
+            fontSize="sm"
+            _dark={{ bg: "gray.700", color: "gray.300" }}
+          >
+            {count}
+          </Flex>
+          <Accordion.ItemIndicator color="gray.400" />
+        </Flex>
+      </Flex>
+    </Accordion.ItemTrigger>
+    <Accordion.ItemContent px={{ base: 4, md: 6 }} pb={6} pt={2}>
+      {tasks.length > 0 ? (
+        <Flex flexDir="column" gap={4} w="100%">
+          {tasks.map((task) => (
+            <CardTask key={task.id} {...task} />
+          ))}
+        </Flex>
+      ) : (
+        <Flex justifyContent="center" alignItems="center" py={8} color="gray.400" _dark={{ color: "gray.500" }}>
+          <Text fontSize="sm">Nenhuma tarefa encontrada.</Text>
+        </Flex>
+      )}
+    </Accordion.ItemContent>
+  </Accordion.Item>
+);
 
 export default function ContainerTasks() {
   const { user } = useStore()
@@ -124,178 +194,57 @@ export default function ContainerTasks() {
   }, [user])
 
   return (
-    <>
-      {user ? null : (
+    <Flex flexDir="column" w="100%" maxW="1000px" mx="auto" px={4} py={8}>
+      {!user ? (
         <Flex
-          w={"100%"}
-          h={"100%"}
-          justifyContent={"center"}
-          alignItems={"center"}
+          w="100%"
+          p={8}
+          bg="blue.50"
+          color="blue.700"
+          _dark={{ color: "blue.200" }}
+          borderRadius="xl"
+          justifyContent="center"
+          alignItems="center"
+          boxShadow="sm"
         >
-          <Text>Faça login para adicionar tarefas</Text>
+          <Text fontSize="lg" fontWeight="medium">Faça login para adicionar tarefas</Text>
         </Flex>
+      ) : (
+        <Accordion.Root collapsible multiple defaultValue={["in-progress"]} w="100%">
+          <TaskCategory
+            value="in-progress"
+            title="Em andamento"
+            count={totalTasksInProgress}
+            icon={FaPlay}
+            colorScheme="blue"
+            tasks={inProgressTasks}
+          />
+          <TaskCategory
+            value="pending"
+            title="Pendentes"
+            count={totalTasksActive}
+            icon={FaClock}
+            colorScheme="orange"
+            tasks={tasksActive}
+          />
+          <TaskCategory
+            value="completed"
+            title="Concluídas"
+            count={totalTasksCompleted}
+            icon={FaCheck}
+            colorScheme="green"
+            tasks={completedTasks}
+          />
+          <TaskCategory
+            value="all"
+            title="Todas as tarefas"
+            count={totalTasks}
+            icon={FaListUl}
+            colorScheme="purple"
+            tasks={tasks}
+          />
+        </Accordion.Root>
       )}
-
-      <Accordion.Root collapsible>
-        <Accordion.Item borderBottom={"1px solid"} borderColor={"gray.400"} mx={8}>
-          <Accordion.ItemTrigger justifyContent={"space-between"} px={8} py={4}>
-            <Flex mt={10}>
-              <Text fontSize={"lg"} fontWeight={"bold"}>
-                Em andamento: {totalTasksInProgress}
-              </Text>
-            </Flex>
-
-
-            <Accordion.ItemIndicator />
-          </Accordion.ItemTrigger>
-          <Accordion.ItemContent>
-
-            <Flex
-              flexDir={"column"}
-              justifyContent={"space-around"}
-              w={"100%"}
-              h={"100%"}
-            >
-              {inProgressTasks.map((task) => (
-                <CardTask
-                  key={task.id}
-                  id={task.id}
-                  title={task.title}
-                  priority={task.priority}
-                  tags={task.tags}
-                  description={task.description}
-                  dueDate={task.dueDate}
-                  userCreator={task.userCreator}
-                  userEmail={task.userEmail}
-                  isCompleted={task.isCompleted}
-                  userCompleted={task.userCompleted}
-                  createdAt={task.createdAt}
-                  status={task.status}
-                />
-              ))}
-            </Flex></Accordion.ItemContent>
-        </Accordion.Item>
-      </Accordion.Root>
-
-
-
-      <Accordion.Root collapsible>
-        <Accordion.Item borderBottom={"1px solid"} borderColor={"gray.400"} mx={8}>
-          <Accordion.ItemTrigger justifyContent={"space-between"} px={8} py={4}>
-            <Flex mt={10}>
-              <Text fontSize={"lg"} fontWeight={"bold"}>
-                Pendentes: {totalTasksActive}
-              </Text>
-            </Flex>
-
-
-            <Accordion.ItemIndicator />
-          </Accordion.ItemTrigger>
-          <Accordion.ItemContent><Flex
-            flexDir={"column"}
-            justifyContent={"space-around"}
-            w={"100%"}
-            h={"100%"}
-          >
-            {tasksActive.map((task) => (
-              <CardTask
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                priority={task.priority}
-                tags={task.tags}
-                description={task.description}
-                dueDate={task.dueDate}
-                userCreator={task.userCreator}
-                userEmail={task.userEmail}
-                isCompleted={task.isCompleted}
-                userCompleted={task.userCompleted}
-                createdAt={task.createdAt}
-                status={task.status}
-              />
-            ))}
-          </Flex></Accordion.ItemContent>
-        </Accordion.Item>
-      </Accordion.Root>
-
-      <Accordion.Root collapsible>
-        <Accordion.Item borderBottom={"1px solid"} borderColor={"gray.400"} mx={8}>
-          <Accordion.ItemTrigger justifyContent={"space-between"} px={8} py={4}>
-            <Flex mt={10}>
-              <Text fontSize={"lg"} fontWeight={"bold"}>
-                Concluídas: {totalTasksCompleted}
-              </Text>
-            </Flex>
-
-
-            <Accordion.ItemIndicator />
-          </Accordion.ItemTrigger>
-          <Accordion.ItemContent><Flex
-            flexDir={"column"}
-            justifyContent={"space-around"}
-            w={"100%"}
-            h={"100%"}
-          >
-            {completedTasks.map((task) => (
-              <CardTask
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                priority={task.priority}
-                tags={task.tags}
-                description={task.description}
-                dueDate={task.dueDate}
-                userCreator={task.userCreator}
-                userEmail={task.userEmail}
-                isCompleted={task.isCompleted}
-                userCompleted={task.userCompleted}
-                createdAt={task.createdAt}
-                status={task.status}
-              />
-            ))}
-          </Flex></Accordion.ItemContent>
-        </Accordion.Item>
-      </Accordion.Root>
-
-      <Accordion.Root collapsible>
-        <Accordion.Item borderBottom={"1px solid"} borderColor={"gray.400"} mx={8}>
-          <Accordion.ItemTrigger justifyContent={"space-between"} px={8} py={4}>
-            <Flex mt={10}>
-              <Text fontSize={"lg"} fontWeight={"bold"}>
-                Todas as tarefas: {totalTasks}
-              </Text>
-            </Flex>
-
-
-            <Accordion.ItemIndicator />
-          </Accordion.ItemTrigger>
-          <Accordion.ItemContent><Flex
-            flexDir={"column"}
-            justifyContent={"space-around"}
-            w={"100%"}
-            h={"100%"}
-          >
-            {tasks.map((task) => (
-              <CardTask
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                priority={task.priority}
-                tags={task.tags}
-                description={task.description}
-                dueDate={task.dueDate}
-                userCreator={task.userCreator}
-                userEmail={task.userEmail}
-                isCompleted={task.isCompleted}
-                userCompleted={task.userCompleted}
-                createdAt={task.createdAt}
-                status={task.status}
-              />
-            ))}
-          </Flex></Accordion.ItemContent>
-        </Accordion.Item>
-      </Accordion.Root>
-
-    </>
+    </Flex>
   )
 }
