@@ -33,8 +33,7 @@ export default function SimpleCard({
         transition: "all 0.3s ease",
         cursor: "pointer",
       }}
-      // as={Link}
-      // href={linkCard}
+
     >
       <Flex flexDir="row" justifyContent={"space-between"} w={"full"} gap={3}>
         <Flex
