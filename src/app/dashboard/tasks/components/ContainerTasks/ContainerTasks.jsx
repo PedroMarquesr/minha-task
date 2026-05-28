@@ -1,5 +1,3 @@
-
-
 import { Flex, Text, Accordion } from "@chakra-ui/react"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { useState, useEffect } from "react"
@@ -10,7 +8,14 @@ import { useStore } from "@/hooks/useStore"
 import { db } from "@/lib/firebase"
 import CardTask from "./components/CardTask/CardTask"
 
-const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, tasks }) => (
+const TaskCategory = ({
+  value,
+  title,
+  count,
+  icon: IconComponent,
+  colorScheme,
+  tasks,
+}) => (
   <Accordion.Item
     value={value}
     bg="white"
@@ -29,7 +34,13 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
       transition="all 0.2s"
       cursor="pointer"
     >
-      <Flex alignItems="center" flex="1" minW={0} justifyContent="space-between" gap={2}>
+      <Flex
+        alignItems="center"
+        flex="1"
+        minW={0}
+        justifyContent="space-between"
+        gap={2}
+      >
         <Flex alignItems="center" gap={4} minW={0} flex="1">
           <Flex
             alignItems="center"
@@ -44,7 +55,13 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
           >
             <IconComponent size={18} />
           </Flex>
-          <Text fontSize="lg" fontWeight="semibold" color="gray.800" _dark={{ color: "gray.100" }} noOfLines={1}>
+          <Text
+            fontSize="lg"
+            fontWeight="semibold"
+            color="gray.800"
+            _dark={{ color: "gray.100" }}
+            noOfLines={1}
+          >
             {title}
           </Text>
         </Flex>
@@ -68,11 +85,7 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
         </Flex>
       </Flex>
     </Accordion.ItemTrigger>
-    <Accordion.ItemContent
-      pb={6}
-      pt={2}
-      overflowX="hidden"
-    >
+    <Accordion.ItemContent pb={6} pt={2} overflowX="hidden">
       {tasks.length > 0 ? (
         <Flex flexDir="column" gap={4}>
           {tasks.map((task) => (
@@ -80,13 +93,19 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
           ))}
         </Flex>
       ) : (
-        <Flex justifyContent="center" alignItems="center" py={8} color="gray.400" _dark={{ color: "gray.500" }}>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          py={8}
+          color="gray.400"
+          _dark={{ color: "gray.500" }}
+        >
           <Text fontSize="sm">Nenhuma tarefa encontrada.</Text>
         </Flex>
       )}
     </Accordion.ItemContent>
   </Accordion.Item>
-);
+)
 
 export default function ContainerTasks() {
   const { user } = useStore()
@@ -127,7 +146,9 @@ export default function ContainerTasks() {
           tasksList.push({ ...doc.data(), id: doc.id })
         })
         setTotalTasks(tasksList.length)
+
         setTasks(sortTasks(tasksList))
+        console.log("Todas as tarefas:", tasksList)
       },
       (error) => {
         console.error("Erro ao buscar tarefas:", error)
@@ -203,12 +224,7 @@ export default function ContainerTasks() {
   }, [user])
 
   return (
-    <Flex
-      flexDir="column"
-      py={8}
-      overflowX="hidden"
-      w="100%"
-    >
+    <Flex flexDir="column" py={8} overflowX="hidden" w="100%">
       {!user ? (
         <Flex
           w="100%"
@@ -221,7 +237,9 @@ export default function ContainerTasks() {
           alignItems="center"
           boxShadow="sm"
         >
-          <Text fontSize="lg" fontWeight="medium">Faça login para adicionar tarefas</Text>
+          <Text fontSize="lg" fontWeight="medium">
+            Faça login para adicionar tarefas
+          </Text>
         </Flex>
       ) : (
         <Accordion.Root collapsible multiple defaultValue={["in-progress"]}>
