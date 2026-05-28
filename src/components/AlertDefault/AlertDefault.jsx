@@ -7,7 +7,7 @@ export default function AlertDefault({ description, status }) {
     return (
         <Alert.Root
             status={status}
-            w="100vw"
+            w="100%"
             zIndex={100}
             position="fixed"
             variant="solid"

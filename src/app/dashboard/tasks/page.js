@@ -94,7 +94,7 @@ export default function Tasks() {
   }
 
   return (
-    <Flex p={10} flexDir={"column"} gap={5}>
+    <Flex p={{ base: 4, md: 10 }} flexDir={"column"} gap={5} w="100%" overflowX="hidden" boxSizing="border-box">
       <AlertCustom
         description="Tarefa adicionada com sucesso"
         status={"success"}

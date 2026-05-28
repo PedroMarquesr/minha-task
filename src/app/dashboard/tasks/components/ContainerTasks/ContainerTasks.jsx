@@ -1,3 +1,5 @@
+
+
 import { Flex, Text, Accordion } from "@chakra-ui/react"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { useState, useEffect } from "react"
@@ -27,8 +29,8 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
       transition="all 0.2s"
       cursor="pointer"
     >
-      <Flex alignItems="center" w="100%" justifyContent="space-between">
-        <Flex alignItems="center" gap={4}>
+      <Flex alignItems="center" flex="1" minW={0} justifyContent="space-between" gap={2}>
+        <Flex alignItems="center" gap={4} minW={0} flex="1">
           <Flex
             alignItems="center"
             justifyContent="center"
@@ -37,16 +39,17 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
             borderRadius="full"
             bg={`${colorScheme}.100`}
             color={`${colorScheme}.600`}
+            flexShrink={0}
             _dark={{ bg: `${colorScheme}.900`, color: `${colorScheme}.200` }}
           >
             <IconComponent size={18} />
           </Flex>
-          <Text fontSize="lg" fontWeight="semibold" color="gray.800" _dark={{ color: "gray.100" }}>
+          <Text fontSize="lg" fontWeight="semibold" color="gray.800" _dark={{ color: "gray.100" }} noOfLines={1}>
             {title}
           </Text>
         </Flex>
 
-        <Flex alignItems="center" gap={4}>
+        <Flex alignItems="center" gap={4} flexShrink={0}>
           <Flex
             alignItems="center"
             justifyContent="center"
@@ -65,9 +68,13 @@ const TaskCategory = ({ value, title, count, icon: IconComponent, colorScheme, t
         </Flex>
       </Flex>
     </Accordion.ItemTrigger>
-    <Accordion.ItemContent px={{ base: 4, md: 6 }} pb={6} pt={2}>
+    <Accordion.ItemContent
+      pb={6}
+      pt={2}
+      overflowX="hidden"
+    >
       {tasks.length > 0 ? (
-        <Flex flexDir="column" gap={4} w="100%">
+        <Flex flexDir="column" gap={4}>
           {tasks.map((task) => (
             <CardTask key={task.id} {...task} />
           ))}
@@ -106,6 +113,7 @@ export default function ContainerTasks() {
         return dateA - dateB
       })
     }
+
     // Total Tasks Active
     const allTasksQuery = query(
       collection(db, "tasks"),
@@ -125,13 +133,13 @@ export default function ContainerTasks() {
         console.error("Erro ao buscar tarefas:", error)
       },
     )
+
     // Tarefas em Andamento
     const qinProgress = query(
       collection(db, "tasks"),
       where("status", "==", "Fazendo"),
       where("companyId", "==", user.companyId),
     )
-
     const unsubscribeInProgressTasks = onSnapshot(
       qinProgress,
       (querySnapshot) => {
@@ -167,6 +175,7 @@ export default function ContainerTasks() {
         console.error("Erro ao buscar tarefas ativas:", error)
       },
     )
+
     // Tarefas concluidas
     const qCompleted = query(
       collection(db, "tasks"),
@@ -194,7 +203,12 @@ export default function ContainerTasks() {
   }, [user])
 
   return (
-    <Flex flexDir="column" w="100%" maxW="1000px" mx="auto" px={4} py={8}>
+    <Flex
+      flexDir="column"
+      py={8}
+      overflowX="hidden"
+      w="100%"
+    >
       {!user ? (
         <Flex
           w="100%"
@@ -210,7 +224,7 @@ export default function ContainerTasks() {
           <Text fontSize="lg" fontWeight="medium">Faça login para adicionar tarefas</Text>
         </Flex>
       ) : (
-        <Accordion.Root collapsible multiple defaultValue={["in-progress"]} w="100%">
+        <Accordion.Root collapsible multiple defaultValue={["in-progress"]}>
           <TaskCategory
             value="in-progress"
             title="Em andamento"
