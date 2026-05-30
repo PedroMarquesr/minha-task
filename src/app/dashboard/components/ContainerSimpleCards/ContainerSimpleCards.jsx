@@ -23,7 +23,7 @@ export default function ContainerSimpleCards({ linkTasks }) {
     const q = query(
       collection(db, "tasks"),
       where("status", "==", "A fazer"),
-      where("companyId", "==", user.companyId),
+      where("companyId", "==", user.companyId || null),
     )
 
     const unsubscribe = onSnapshot(
@@ -66,7 +66,7 @@ export default function ContainerSimpleCards({ linkTasks }) {
       where("dueDate", ">=", startOfDay),
       where("dueDate", "<=", endOfDay),
       where("status", "==", "A fazer"),
-      where("companyId", "==", user.companyId),
+      where("companyId", "==", user.companyId || null),
     )
 
     const unsubscribe = onSnapshot(

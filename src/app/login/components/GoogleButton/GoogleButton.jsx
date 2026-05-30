@@ -36,7 +36,10 @@ export default function GoogleButton() {
 
       // Salva usuário + empresa no store
       setUser({
-        ...loggedUser,
+        uid: loggedUser.uid,
+        email: loggedUser.email,
+        displayName: loggedUser.displayName,
+        photoURL: loggedUser.photoURL,
         companyId: company?.id || null,
         role: company?.roles?.[loggedUser.uid] || "member",
       })
