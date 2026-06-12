@@ -64,7 +64,7 @@ export default function GoogleButton() {
         variant="outline"
       >
         <Icon as={FcGoogle} size={"2xl"} mr={2} />
-        Entrar com sua conta Google
+        Iniciar ou Entrar com Google
       </Button>
 
       {user && (

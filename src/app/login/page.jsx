@@ -46,45 +46,45 @@ export default function Login() {
 
   const { setUser } = useStore()
 
-  const findUserCompany = async (uid) => {
-    const q = query(
-      collection(db, "companies"),
-      where("members", "array-contains", uid),
-    )
+  // const findUserCompany = async (uid) => {
+  //   const q = query(
+  //     collection(db, "companies"),
+  //     where("members", "array-contains", uid),
+  //   )
 
-    const snapshot = await getDocs(q)
-    if (!snapshot.empty) {
-      const doc = snapshot.docs[0]
-      return { id: doc.id, ...doc.data() }
-    }
-    return null
-  }
+  //   const snapshot = await getDocs(q)
+  //   if (!snapshot.empty) {
+  //     const doc = snapshot.docs[0]
+  //     return { id: doc.id, ...doc.data() }
+  //   }
+  //   return null
+  // }
 
-  const handleLogin = async () => {
-    try {
-      setLoading(true)
-      const result = await signInWithEmailAndPassword(auth, email, password)
-      const loggedUser = result.user
+  // const handleLogin = async () => {
+  //   try {
+  //     setLoading(true)
+  //     const result = await signInWithEmailAndPassword(auth, email, password)
+  //     const loggedUser = result.user
 
-      const company = await findUserCompany(loggedUser.uid)
+  //     const company = await findUserCompany(loggedUser.uid)
 
-      setUser({
-        uid: loggedUser.uid,
-        email: loggedUser.email,
-        displayName: loggedUser.displayName,
-        photoURL: loggedUser.photoURL,
-        companyId: company?.id || null,
-        role: company?.roles?.[loggedUser.uid] || "member",
-      })
+  //     setUser({
+  //       uid: loggedUser.uid,
+  //       email: loggedUser.email,
+  //       displayName: loggedUser.displayName,
+  //       photoURL: loggedUser.photoURL,
+  //       companyId: company?.id || null,
+  //       role: company?.roles?.[loggedUser.uid] || "member",
+  //     })
 
-      router.push("/dashboard")
-    } catch (error) {
-      console.log(error)
-      setError(traduzirErro(error.code))
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     router.push("/dashboard")
+  //   } catch (error) {
+  //     console.log(error)
+  //     setError(traduzirErro(error.code))
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   return (
     <Box minH="100vh">
@@ -120,12 +120,12 @@ export default function Login() {
             <Text fontSize="2xl" fontWeight="bold" fontFamily="heading">
               Bem-vindo de volta!
             </Text>
-            <Text color="gray.500" fontSize="sm" textAlign="center" mt={1}>
+            {/* <Text color="gray.500" fontSize="sm" textAlign="center" mt={1}>
               Insira suas credenciais para acessar sua área de gestão.
-            </Text>
+            </Text> */}
           </Flex>
 
-          <Flex flexDir="column" w="100%" gap={4}>
+          {/* <Flex flexDir="column" w="100%" gap={4}>
             <Flex flexDir="column" gap={1}>
               <Text fontSize="sm" fontWeight="medium">
                 E-mail
@@ -194,8 +194,8 @@ export default function Login() {
                 Cadastre-se
               </Text>
             </Link>
-          </Flex>
-
+          </Flex> */}
+          <Flex justifyContent="center"></Flex>
           <GoogleButton />
         </Flex>
       </Flex>
