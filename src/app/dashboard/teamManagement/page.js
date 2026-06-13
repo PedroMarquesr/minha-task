@@ -1,5 +1,6 @@
 import { Flex, Text, Button } from "@chakra-ui/react"
 import ContainerCounterMembers from "./components/ContainerCounterMembers/ContainerCounterMembers"
+import ContainerListMembers from "./components/ContainerListMembers/ContainerListMembers"
 import { FaUserPlus } from "react-icons/fa6"
 
 export default function TeamManagement() {
@@ -41,15 +42,21 @@ export default function TeamManagement() {
             w={{ base: "100%", md: "auto" }}
             colorPalette={"green"}
             mr={{ base: 0, md: 10 }}
-            //   onClick={() => setOpenDrawer(true)}
+          //   onClick={() => setOpenDrawer(true)}
           >
             <FaUserPlus />
             Adicionar membro
           </Button>
         </Flex>
       </Flex>
-      <Flex>
-        <ContainerCounterMembers />
+
+      <Flex gap={2} flexDir={{ base: "column", md: "row" }}>
+        <Flex border={"2px solid red"}>
+          <ContainerCounterMembers />
+        </Flex>
+        <Flex w={"100%"} border={"2px solid blue"}>
+          <ContainerListMembers />
+        </Flex>
       </Flex>
     </Flex>
   )
