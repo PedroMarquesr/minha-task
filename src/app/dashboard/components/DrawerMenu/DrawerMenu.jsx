@@ -37,6 +37,11 @@ export default function DrawerMenu({ openMenu, setOpenMenu }) {
       href: "/dashboard/teamManagement",
       icon: "",
     },
+    {
+      label: "Perfil",
+      href: "/dashboard/profile",
+      icon: "",
+    },
   ]
   return (
     <Drawer.Root open={openMenu} onOpenChange={(e) => setOpenMenu(e.open)}>
