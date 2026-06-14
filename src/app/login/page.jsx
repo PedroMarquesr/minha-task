@@ -214,8 +214,7 @@ export default function Login() {
               </Drawer.Content>
             </Drawer.Positioner>
           </Drawer.Root>
-          <Text>{user?.companyId}</Text>
-          <Text>{user?.role}</Text>
+
 
 
         </Flex>
