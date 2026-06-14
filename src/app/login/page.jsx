@@ -217,8 +217,6 @@ export default function Login() {
 
 
 
-          <Flex justifyContent="center"></Flex>
-          <GoogleButton />
         </Flex>
 
       </Flex>
