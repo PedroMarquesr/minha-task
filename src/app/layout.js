@@ -5,7 +5,7 @@ import { Jost, DM_Serif_Display } from "next/font/google"
 import { Box } from "@chakra-ui/react"
 import { useStore } from "@/hooks/useStore"
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 const jost = Jost({
   subsets: ["latin"],
@@ -24,13 +24,14 @@ function ActivityTracker() {
   const checkInactivity = useStore((s) => s.checkInactivity)
   const user = useStore((s) => s.user)
   const router = useRouter()
+  const pathname = usePathname()
 
-  // Redireciona quando deslogar por inatividade
+  // Redireciona quando deslogar por inatividade, mas não se estiver em rota pública
   useEffect(() => {
-    if (!user) {
+    if (!user && pathname !== "/login" && !pathname.startsWith("/invite")) {
       router.push("/login")
     }
-  }, [user])
+  }, [user, pathname])
 
   useEffect(() => {
     const eventos = ["click", "keydown", "scroll", "mousemove"]
