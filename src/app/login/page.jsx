@@ -164,10 +164,6 @@ export default function Login() {
             </Text>
 
           </Flex>
-
-
-          <Flex justifyContent="center">
-          </Flex>
           <Suspense fallback={<Spinner />}>
             <GoogleButton onNeedsSetup={(loggedUser) => {
               setTempUser(loggedUser)
@@ -220,6 +216,9 @@ export default function Login() {
           </Drawer.Root>
 
 
+
+          <Flex justifyContent="center"></Flex>
+          <GoogleButton />
         </Flex>
 
       </Flex>
