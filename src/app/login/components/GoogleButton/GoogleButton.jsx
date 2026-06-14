@@ -10,14 +10,15 @@ import { db } from "@/lib/firebase"
 export default function GoogleButton() {
   const provider = new GoogleAuthProvider()
   const { user, setUser } = useStore()
+  const { member, setMember } = useStore()
   const router = useRouter()
 
   const findUserCompany = async (uid) => {
+
     const q = query(
       collection(db, "companies"),
       where("members", "array-contains", uid),
     )
-
     const snapshot = await getDocs(q)
     if (!snapshot.empty) {
       const doc = snapshot.docs[0]
@@ -43,6 +44,7 @@ export default function GoogleButton() {
         companyId: company?.id || null,
         role: company?.roles?.[loggedUser.uid] || "member",
       })
+
       console.log("Empresa encontrada:", company)
       console.log("Role do usuário:", company?.roles?.[loggedUser.uid])
       console.log("Empresa", company)
