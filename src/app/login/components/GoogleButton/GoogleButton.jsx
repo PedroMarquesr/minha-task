@@ -3,50 +3,73 @@ import { signInWithPopup, GoogleAuthProvider } from "firebase/auth"
 import { FcGoogle } from "react-icons/fc"
 import { useStore } from "@/hooks/useStore"
 import { auth } from "@/lib/firebase"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
-export default function GoogleButton() {
+import { findUserCompany, acceptInviteForUser } from "@/utils/company"
+
+export default function GoogleButton({ onNeedsSetup }) {
   const provider = new GoogleAuthProvider()
   const { user, setUser } = useStore()
-  const router = useRouter()
-
-  const findUserCompany = async (uid) => {
-    const q = query(
-      collection(db, "companies"),
-      where("members", "array-contains", uid),
-    )
-
-    const snapshot = await getDocs(q)
-    if (!snapshot.empty) {
-      const doc = snapshot.docs[0]
-      return { id: doc.id, ...doc.data() }
-    }
-    return null
-  }
+  const { member, setMember } = useStore()
+  const searchParams = useSearchParams()
+  const inviteId = searchParams.get("invite")
 
   const handleLoginGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, provider)
       const loggedUser = result.user
 
-      // Busca a empresa do usuário
+      // 1. Verifica se há um convite na URL
+      if (inviteId) {
+        try {
+          const company = await acceptInviteForUser(
+            inviteId, 
+            loggedUser.uid, 
+            loggedUser.displayName, 
+            loggedUser.email
+          )
+          
+          setUser({
+            uid: loggedUser.uid,
+            email: loggedUser.email,
+            displayName: loggedUser.displayName,
+            photoURL: loggedUser.photoURL,
+            companyId: company.id,
+            role: company.members?.[loggedUser.uid]?.role || "member",
+          })
+          console.log("Convite aceito, ingressou na empresa:", company)
+          router.push("/dashboard")
+          return // Finaliza o fluxo aqui
+        } catch (inviteError) {
+          console.error("Erro ao aceitar convite (pode ter expirado ou ser inválido):", inviteError.message)
+          alert("Não foi possível aceitar o convite: " + inviteError.message)
+          // Continua para o fluxo normal de login se o convite falhar
+        }
+      }
+
+      // 2. Fluxo normal: Busca a empresa do usuário
       const company = await findUserCompany(loggedUser.uid)
 
-      // Salva usuário + empresa no store
-      setUser({
-        uid: loggedUser.uid,
-        email: loggedUser.email,
-        displayName: loggedUser.displayName,
-        photoURL: loggedUser.photoURL,
-        companyId: company?.id || null,
-        role: company?.roles?.[loggedUser.uid] || "member",
-      })
-      console.log("Empresa encontrada:", company)
-      console.log("Role do usuário:", company?.roles?.[loggedUser.uid])
-      console.log("Empresa", company)
-      router.push("/dashboard")
+      if (company) {
+        // Se a empresa existir, salva usuário + empresa no store e vai para dashboard
+        setUser({
+          uid: loggedUser.uid,
+          email: loggedUser.email,
+          displayName: loggedUser.displayName,
+          photoURL: loggedUser.photoURL,
+          companyId: company.id,
+          role: company.members?.[loggedUser.uid]?.role || "member",
+        })
+        console.log("Empresa encontrada:", company)
+        router.push("/dashboard")
+      } else {
+        // Se não tiver empresa, avisa o componente pai para abrir o Drawer
+        if (onNeedsSetup) {
+          onNeedsSetup(loggedUser)
+        }
+      }
     } catch (error) {
       console.error("Erro:", error.message)
     }
