@@ -13,6 +13,7 @@ export default function GoogleButton({ onNeedsSetup }) {
   const provider = new GoogleAuthProvider()
   const { user, setUser } = useStore()
   const { member, setMember } = useStore()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const inviteId = searchParams.get("invite")
 
