@@ -12,7 +12,7 @@ import { auth, db } from "@/lib/firebase"
 import { collection, query, where, getDocs } from "firebase/firestore"
 import GoogleButton from "./components/GoogleButton/GoogleButton"
 import { useStore } from "@/hooks/useStore"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { createCompanyForUser } from "@/utils/company"
 
 
@@ -168,10 +168,12 @@ export default function Login() {
 
           <Flex justifyContent="center">
           </Flex>
-          <GoogleButton onNeedsSetup={(loggedUser) => {
-            setTempUser(loggedUser)
-            setShowDrawer(true)
-          }} />
+          <Suspense fallback={<Spinner />}>
+            <GoogleButton onNeedsSetup={(loggedUser) => {
+              setTempUser(loggedUser)
+              setShowDrawer(true)
+            }} />
+          </Suspense>
 
 
           <Drawer.Root open={showDrawer} onClose={() => setShowDrawer(false)}>
