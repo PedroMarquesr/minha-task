@@ -17,7 +17,7 @@ export function Provider(props) {
       if (firebaseUser) {
         const q = query(
           collection(db, "companies"),
-          where("members", "array-contains", firebaseUser.uid)
+          where(`members.${firebaseUser.uid}`, "!=", null)
         )
         let companyId = null
         let role = "member"
@@ -27,7 +27,8 @@ export function Provider(props) {
           if (!snapshot.empty) {
             const doc = snapshot.docs[0]
             companyId = doc.id
-            role = doc.data().roles?.[firebaseUser.uid] || "member"
+            const data = doc.data()
+            role = data.members?.[firebaseUser.uid]?.role || "member"
           }
         } catch (error) {
           console.error("Error fetching user company in AuthProvider:", error)

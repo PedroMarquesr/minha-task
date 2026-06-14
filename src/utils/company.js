@@ -9,9 +9,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore"
 
-// Busca a empresa do usuário pelo uid
-// Sua estrutura no Firestore é: members: { uid: { role: "owner" } }
-// Por isso usamos members.{uid} != null (e não array-contains)
+
 export const findUserCompany = async (uid) => {
   if (!uid) return null
 
@@ -30,16 +28,16 @@ export const findUserCompany = async (uid) => {
   return null // usuário não pertence a nenhuma empresa
 }
 
-// Cria uma empresa nova para o usuário
-// Isso acontece quando o usuário loga pela primeira vez
-export const createCompanyForUser = async (uid, displayName, email) => {
-  const companyRef = doc(collection(db, "companies")) // gera um ID automático
+export const createCompanyForUser = async (uid, displayName, email, companyName, phone) => {
+  const companyRef = doc(collection(db, "companies"))
+
 
   const newCompany = {
-    name: "", // o usuário vai preencher no onboarding
+    name: companyName || "",
+    phone: phone || "",
     ownerId: uid,
     createdAt: serverTimestamp(),
-    onboardingComplete: false,
+    onboardingComplete: true,
     members: {
       [uid]: {
         role: "owner",

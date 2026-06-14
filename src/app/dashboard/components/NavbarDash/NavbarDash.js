@@ -22,26 +22,20 @@ export default function NavBarDash({ setOpenMenu }) {
   useEffect(() => {
     if (!user?.uid) return
 
-    // Cria a query buscando na coleção "companies"
-    // onde o campo "members" (que é um array) contém o ID do usuário logado
     const q = query(
       collection(db, "companies"),
-      where("members", "array-contains", user.uid),
+      where(`members.${user.uid}`, "!=", null),
     )
 
-    // onSnapshot "escuta" os resultados em tempo real
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       if (!querySnapshot.empty) {
-        // Se encontrou alguma empresa, pegamos a primeira (índice 0)
         const companyDoc = querySnapshot.docs[0]
-        // Setamos o estado com o valor do campo "name" do documento
         setCompanyName(companyDoc.data().name)
       } else {
         setCompanyName("Sem Equipe")
       }
     })
 
-    // Função de limpeza: para de escutar o Firebase quando o componente for desmontado
     return () => unsubscribe()
   }, [user])
 

@@ -7,25 +7,13 @@ import { useRouter } from "next/navigation"
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
-export default function GoogleButton() {
+import { findUserCompany } from "@/utils/company"
+
+export default function GoogleButton({ onNeedsSetup }) {
   const provider = new GoogleAuthProvider()
   const { user, setUser } = useStore()
   const { member, setMember } = useStore()
   const router = useRouter()
-
-  const findUserCompany = async (uid) => {
-
-    const q = query(
-      collection(db, "companies"),
-      where("members", "array-contains", uid),
-    )
-    const snapshot = await getDocs(q)
-    if (!snapshot.empty) {
-      const doc = snapshot.docs[0]
-      return { id: doc.id, ...doc.data() }
-    }
-    return null
-  }
 
   const handleLoginGoogle = async () => {
     try {
@@ -35,20 +23,24 @@ export default function GoogleButton() {
       // Busca a empresa do usuário
       const company = await findUserCompany(loggedUser.uid)
 
-      // Salva usuário + empresa no store
-      setUser({
-        uid: loggedUser.uid,
-        email: loggedUser.email,
-        displayName: loggedUser.displayName,
-        photoURL: loggedUser.photoURL,
-        companyId: company?.id || null,
-        role: company?.roles?.[loggedUser.uid] || "member",
-      })
-
-      console.log("Empresa encontrada:", company)
-      console.log("Role do usuário:", company?.roles?.[loggedUser.uid])
-      console.log("Empresa", company)
-      router.push("/dashboard")
+      if (company) {
+        // Se a empresa existir, salva usuário + empresa no store e vai para dashboard
+        setUser({
+          uid: loggedUser.uid,
+          email: loggedUser.email,
+          displayName: loggedUser.displayName,
+          photoURL: loggedUser.photoURL,
+          companyId: company.id,
+          role: company.members?.[loggedUser.uid]?.role || "member",
+        })
+        console.log("Empresa encontrada:", company)
+        router.push("/dashboard")
+      } else {
+        // Se não tiver empresa, avisa o componente pai para abrir o Drawer
+        if (onNeedsSetup) {
+          onNeedsSetup(loggedUser)
+        }
+      }
     } catch (error) {
       console.error("Erro:", error.message)
     }
