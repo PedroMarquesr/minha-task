@@ -120,81 +120,10 @@ export default function Login() {
             <Text fontSize="2xl" fontWeight="bold" fontFamily="heading">
               Bem-vindo de volta!
             </Text>
-            {/* <Text color="gray.500" fontSize="sm" textAlign="center" mt={1}>
-              Insira suas credenciais para acessar sua área de gestão.
-            </Text> */}
+
           </Flex>
 
-          {/* <Flex flexDir="column" w="100%" gap={4}>
-            <Flex flexDir="column" gap={1}>
-              <Text fontSize="sm" fontWeight="medium">
-                E-mail
-              </Text>
-              <Input
-                placeholder="seu@email.com"
-                type="email"
-                size="md"
-                borderRadius="md"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Flex>
 
-            <Flex flexDir="column" gap={1}>
-              <Text fontSize="sm" fontWeight="medium">
-                Senha
-              </Text>
-              <Input
-                placeholder="••••••••"
-                type="password"
-                size="md"
-                borderRadius="md"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Flex justifyContent="flex-end" w="100%">
-                <Link href="#">
-                  <Text
-                    fontSize="xs"
-                    color="blue.500"
-                    _hover={{ textDecoration: "underline" }}
-                    mt={1}
-                  >
-                    Esqueceu a senha?
-                  </Text>
-                </Link>
-              </Flex>
-            </Flex>
-
-            <Button
-              colorPalette="blue"
-              size="lg"
-              w="100%"
-              mt={4}
-              borderRadius="md"
-              onClick={handleLogin}
-              loading={loading}
-              loadingText="Entrando..."
-            >
-              Entrar na sua conta
-            </Button>
-          </Flex>
-
-          <Flex mt={6} justifyContent="center" gap={1}>
-            <Text fontSize="sm" color="gray.500">
-              Não tem uma conta?
-            </Text>
-            <Link href="#">
-              <Text
-                fontSize="sm"
-                color="blue.500"
-                fontWeight="bold"
-                _hover={{ textDecoration: "underline" }}
-              >
-                Cadastre-se
-              </Text>
-            </Link>
-          </Flex> */}
           <Flex justifyContent="center"></Flex>
           <GoogleButton />
         </Flex>
