@@ -187,16 +187,16 @@ export default function Login() {
                     </Text>
                     <Flex flexDir="column" gap={1}>
                       <Text fontWeight="bold">Empresa/Equipe:</Text>
-                      <Input 
-                        placeholder="Digite o nome" 
+                      <Input
+                        placeholder="Digite o nome"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
                       />
                     </Flex>
                     <Flex flexDir="column" gap={1}>
                       <Text fontWeight="bold">Telefone:</Text>
-                      <Input 
-                        placeholder="Digite o telefone" 
+                      <Input
+                        placeholder="Digite o telefone"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />
@@ -214,7 +214,8 @@ export default function Login() {
               </Drawer.Content>
             </Drawer.Positioner>
           </Drawer.Root>
-
+          <Text>{user?.companyId}</Text>
+          <Text>{user?.role}</Text>
 
 
         </Flex>
