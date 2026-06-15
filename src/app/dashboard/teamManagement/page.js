@@ -116,10 +116,10 @@ export default function TeamManagement() {
       </Flex>
 
       <Flex gap={2} flexDir={{ base: "column", md: "row" }}>
-        <Flex border={"2px solid red"}>
+        <Flex >
           <ContainerCounterMembers />
         </Flex>
-        <Flex w={"100%"} border={"2px solid blue"}>
+        <Flex w={"100%"} >
           <ContainerListMembers />
         </Flex>
       </Flex>
