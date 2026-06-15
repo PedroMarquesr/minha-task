@@ -17,6 +17,10 @@ export default function TeamManagement() {
   const { user } = useStore()
 
   const handleInvite = async () => {
+    if (!user?.companyId) {
+      console.error("companyId ainda não carregado")
+      return
+    }
     const inviteRef = doc(collection(db, "invites"))
 
     await setDoc(inviteRef, {
