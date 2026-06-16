@@ -18,11 +18,37 @@ import { useState } from "react"
 import ProcessesSimpleCardsContainer from "./components/ProcessesSimpleCardsContainer/ProcessesSimpleCardsContainer"
 import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ComboboxProcess from "./components/ComboboxProcess/ComboboxProcess"
+import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
 
 export default function PageProcess() {
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
+  const [process, setProcess] = useState({
+    id: uuid(),
+    // companyId: "",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    // userCreator: user.displayName
+    // creatorId: user.uid
+    tags: [],
+    status: "",
+    processNumber: "",
+    typeProcess: "",
+    tribunal: "",
+    partes: [{ nome: "", papel: "" }],
+    arquivado: false,
+    observacoes: "",
+    valorCausa: 0,
+    custos: [
+      {
+        descricao: "",
+        valor: 0,
+        tipo: "",
+        data: new Date(),
+      },
+    ],
+  })
 
   const optionsTypeProcess = [
     { label: "Trabalhista", value: "trabalhista" },
@@ -96,24 +122,55 @@ export default function PageProcess() {
                 <Flex flexDir={"column"} gap={2} w={"100%"}>
                   <Field.Root>
                     <Field.Label>Número do Processo</Field.Label>
-                    <Input placeholder="0000000-00.0000.0.00.0000" />
+                    <Input
+                      placeholder="0000000-00.0000.0.00.0000"
+                      value={process.processNumber}
+                      onChange={(e) =>
+                        setProcess({
+                          ...process,
+                          processNumber: e.target.value,
+                        })
+                      }
+                    />
                   </Field.Root>
                   <Flex gap={2} w={"100%"} justifyContent={"space-between"}>
                     <ComboboxProcess
                       label={"Tipo de processo"}
                       listOptions={optionsTypeProcess}
                       placeholder={"Selecione o tipo de processo"}
+                      value={process.typeProcess}
+                      onValueChange={(details) =>
+                        setProcess({
+                          ...process,
+                          typeProcess: details.value[0] ?? "",
+                        })
+                      }
                     />
                     <ComboboxProcess
                       label={"Status"}
                       listOptions={optionsStatusProcess}
                       placeholder={"Selecione o status"}
+                      value={process.status}
+                      onValueChange={(
+                        details, // ✅
+                      ) =>
+                        setProcess({
+                          ...process,
+                          status: details.value[0] ?? "",
+                        })
+                      }
                     />
                   </Flex>
                   <Flex flexDir={"column"} gap={2} w={"100%"}>
                     <Field.Root>
                       <Field.Label>Tribunal</Field.Label>
-                      <Input placeholder="TRT 2° Região" />
+                      <Input
+                        placeholder="TRT 2° Região"
+                        value={process.tribunal}
+                        onChange={(e) =>
+                          setProcess({ ...process, tribunal: e.target.value })
+                        }
+                      />
                     </Field.Root>
                   </Flex>
                   <Flex flexDir={"column"} gap={2} w={"100%"}>
@@ -149,6 +206,7 @@ export default function PageProcess() {
                         </Flex>
                       </Flex>
                     </Field.Root>
+                    {JSON.stringify(process, null, 2)}
                   </Flex>
                 </Flex>
               </Dialog.Body>
