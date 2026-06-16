@@ -1,26 +1,34 @@
-
 "use client"
 
-import { Flex, Text, Button, Dialog, Clipboard, IconButton, CloseButton } from "@chakra-ui/react"
+import {
+  Flex,
+  Text,
+  Button,
+  Dialog,
+  Clipboard,
+  IconButton,
+  CloseButton,
+} from "@chakra-ui/react"
 import ContainerCounterMembers from "./components/ContainerCounterMembers/ContainerCounterMembers"
 import ContainerListMembers from "./components/ContainerListMembers/ContainerListMembers"
 import { FaUserPlus } from "react-icons/fa6"
 import { useStore } from "@/hooks/useStore"
-import { doc, collection, setDoc, serverTimestamp, Timestamp } from "firebase/firestore"
+import {
+  doc,
+  collection,
+  setDoc,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { useState } from "react"
 export default function TeamManagement() {
   const [openDialog, setOpenDialog] = useState(false)
   const [linkInvite, setLinkInvite] = useState("")
 
-
   const { user } = useStore()
 
   const handleInvite = async () => {
-    if (!user?.companyId) {
-      console.error("companyId ainda não carregado")
-      return
-    }
     const inviteRef = doc(collection(db, "invites"))
 
     await setDoc(inviteRef, {
@@ -81,15 +89,19 @@ export default function TeamManagement() {
             Adicionar membro
           </Button>
 
-          <Dialog.Root open={openDialog} onOpenChange={(e) => setOpenDialog(e.open)} >
+          <Dialog.Root
+            open={openDialog}
+            onOpenChange={(e) => setOpenDialog(e.open)}
+          >
             <Dialog.Trigger />
             <Dialog.Backdrop />
             <Dialog.Positioner>
               <Dialog.Content>
                 <Dialog.CloseTrigger />
                 <Dialog.Header>
-
-                  <Dialog.Title>Compartilhe o link com o novo usuário</Dialog.Title>
+                  <Dialog.Title>
+                    Compartilhe o link com o novo usuário
+                  </Dialog.Title>
                 </Dialog.Header>
                 <Dialog.Body>
                   <Flex align={"center"} flexDir={"row"} gap={4}>
@@ -100,18 +112,16 @@ export default function TeamManagement() {
                           <Clipboard.Indicator />
                         </IconButton>
                       </Clipboard.Trigger>
-
                     </Clipboard.Root>
                   </Flex>
-
                 </Dialog.Body>
                 <Dialog.Footer>
-
                   <Dialog.CloseTrigger asChild>
-                    <CloseButton onClick={() => setOpenDialog(false)} size="sm" />
+                    <CloseButton
+                      onClick={() => setOpenDialog(false)}
+                      size="sm"
+                    />
                   </Dialog.CloseTrigger>
-
-
                 </Dialog.Footer>
               </Dialog.Content>
             </Dialog.Positioner>
@@ -120,13 +130,13 @@ export default function TeamManagement() {
       </Flex>
 
       <Flex gap={2} flexDir={{ base: "column", md: "row" }}>
-        <Flex >
+        <Flex>
           <ContainerCounterMembers />
         </Flex>
-        <Flex w={"100%"} >
+        <Flex w={"100%"}>
           <ContainerListMembers />
         </Flex>
       </Flex>
-    </Flex >
+    </Flex>
   )
 }

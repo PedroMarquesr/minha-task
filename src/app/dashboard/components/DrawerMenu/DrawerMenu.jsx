@@ -18,6 +18,11 @@ export default function DrawerMenu({ openMenu, setOpenMenu }) {
       icon: "",
     },
     {
+      label: "Processos",
+      href: "/dashboard/processes",
+      icon: "",
+    },
+    {
       label: "Tarefas",
       href: "/dashboard/tasks",
       icon: "",

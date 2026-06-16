@@ -94,7 +94,14 @@ export default function Tasks() {
   }
 
   return (
-    <Flex p={{ base: 4, md: 10 }} flexDir={"column"} gap={5} w="100%" overflowX="hidden" boxSizing="border-box">
+    <Flex
+      p={{ base: 4, md: 10 }}
+      flexDir={"column"}
+      gap={5}
+      w="100%"
+      overflowX="hidden"
+      boxSizing="border-box"
+    >
       <AlertCustom
         description="Tarefa adicionada com sucesso"
         status={"success"}
@@ -112,7 +119,7 @@ export default function Tasks() {
           align={{ base: "center", md: "start" }}
         >
           <Text
-            fontSize="5xl"
+            fontSize="2xl"
             fontWeight={"bold"}
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
           >
