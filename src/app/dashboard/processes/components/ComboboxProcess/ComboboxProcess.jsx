@@ -10,6 +10,8 @@ export default function ComboboxProcess({
   label,
   listOptions,
   placeholder,
+  value,
+  onValueChange,
 }) {
   const { contains } = useFilter({ sensitivity: "base" })
 
@@ -23,6 +25,8 @@ export default function ComboboxProcess({
       collection={collection}
       onInputValueChange={(e) => filter(e.inputValue)}
       w={"100%"}
+      value={value ? [value] : []}
+      onValueChange={onValueChange}
     >
       <Combobox.Label>{label}</Combobox.Label>
       <Combobox.Control>
