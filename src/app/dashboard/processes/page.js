@@ -200,7 +200,7 @@ export default function PageProcess() {
                             size={"sm"}
                           >
                             <Flex gap={2} align={"center"}>
-                              <FaPlus /> Adicionar parte
+                              <FaPlus /> Adicionar Tag
                             </Flex>
                           </Button>
                         </Flex>
