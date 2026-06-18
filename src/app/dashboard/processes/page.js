@@ -22,6 +22,7 @@ import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
 
 export default function PageProcess() {
+  const { user } = useAuthContext()
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
   const [process, setProcess] = useState({
@@ -89,7 +90,7 @@ export default function PageProcess() {
             fontWeight={"bold"}
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
           >
-            Processos
+            Processos teste
           </Text>
         </Flex>
         <Flex
