@@ -20,10 +20,13 @@ import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ComboboxProcess from "./components/ComboboxProcess/ComboboxProcess"
 import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
+import { color } from "framer-motion"
 
 export default function PageProcess() {
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
+  const [partes, setPartes] = useState([])
+  const [tags, setTags] = useState([])
   const [process, setProcess] = useState({
     id: uuid(),
     // companyId: "",
@@ -49,7 +52,31 @@ export default function PageProcess() {
       },
     ],
   })
-
+  const defaultProcess = {
+    id: uuid(),
+    // companyId: "",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    // userCreator: user.displayName
+    // creatorId: user.uid
+    tags: [],
+    status: "",
+    processNumber: "",
+    typeProcess: "",
+    tribunal: "",
+    partes: [{ nome: "", papel: "" }],
+    arquivado: false,
+    observacoes: "",
+    valorCausa: 0,
+    custos: [
+      {
+        descricao: "",
+        valor: 0,
+        tipo: "",
+        data: new Date(),
+      },
+    ],
+  }
   const optionsTypeProcess = [
     { label: "Trabalhista", value: "trabalhista" },
     { label: "Cível", value: "civel" },
@@ -151,9 +178,7 @@ export default function PageProcess() {
                       listOptions={optionsStatusProcess}
                       placeholder={"Selecione o status"}
                       value={process.status}
-                      onValueChange={(
-                        details, // ✅
-                      ) =>
+                      onValueChange={(details) =>
                         setProcess({
                           ...process,
                           status: details.value[0] ?? "",
@@ -175,19 +200,87 @@ export default function PageProcess() {
                   </Flex>
                   <Flex flexDir={"column"} gap={2} w={"100%"}>
                     <Field.Root>
-                      <Flex w={"100%"} justifyContent={"space-between"}>
-                        <Field.Label>Partes</Field.Label>
-                        <Flex>
+                      <Flex w={"100%"} flexDir={"column"}>
+                        <Flex justifyContent={"space-between"}>
+                          <Field.Label>Partes</Field.Label>
                           <Button
                             variant={"ghost"}
                             colorPalette={"green"}
                             size={"sm"}
+                            onClick={() =>
+                              setPartes([...partes, { nome: "", polo: "" }])
+                            }
                           >
-                            <Flex gap={2} align={"center"}>
-                              <FaPlus /> Adicionar parte
-                            </Flex>
+                            <FaPlus /> Adicionar parte
                           </Button>
                         </Flex>
+                        <Flex>
+                          <Flex
+                            gap={2}
+                            align={"center"}
+                            flexDir={"column"}
+                            w={"100%"}
+                          >
+                            {partes.map((parte, index) => (
+                              <Flex
+                                key={index}
+                                gap={2}
+                                bgColor={"gray.200"}
+                                p={0.3}
+                                px={3}
+                                w={"100%"}
+                                borderRadius={20}
+                                justify={"space-around"}
+                              >
+                                <Flex>
+                                  <Field.Label mr={2}>Nome</Field.Label>
+                                  <Input
+                                    placeholder="Arnaldo Junior Pereira"
+                                    value={parte.nome}
+                                    onChange={(e) =>
+                                      setPartes(
+                                        partes.map((p, i) =>
+                                          i === index
+                                            ? { ...p, nome: e.target.value }
+                                            : p,
+                                        ),
+                                      )
+                                    }
+                                  />
+                                </Flex>
+
+                                <Flex>
+                                  <Field.Label mr={2}>Polo</Field.Label>
+
+                                  <Input
+                                    placeholder="Reclamante/Reclamada"
+                                    value={parte.polo}
+                                    onChange={(e) =>
+                                      setPartes(
+                                        partes.map((p, i) =>
+                                          i === index
+                                            ? { ...p, polo: e.target.value }
+                                            : p,
+                                        ),
+                                      )
+                                    }
+                                  />
+                                </Flex>
+                                <CloseButton
+                                  color={"red.500"}
+                                  bgColor={"transparent"}
+                                  _hover={{
+                                    bgColor: "transparent",
+                                    color: "red.400",
+                                    transform: "translateY(-2px)",
+                                    transition: "all 0.3s ease",
+                                  }}
+                                />
+                              </Flex>
+                            ))}
+                          </Flex>
+                        </Flex>
+                        {JSON.stringify(partes)}
                       </Flex>
                     </Field.Root>
                     <Field.Root>
@@ -211,7 +304,14 @@ export default function PageProcess() {
                 </Flex>
               </Dialog.Body>
               <Dialog.Footer>
-                <Button variant="outline" onClick={() => setOpenDialog(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    ;(setOpenDialog(false),
+                      setPartes([]),
+                      setProcess(defaultProcess))
+                  }}
+                >
                   Fechar
                 </Button>
                 <Button>Salvar</Button>
