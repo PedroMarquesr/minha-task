@@ -52,9 +52,6 @@ export default function PageProcess() {
     ],
   })
 
-
-
-
   const optionsTypeProcess = [
     { label: "Trabalhista", value: "trabalhista" },
     { label: "Cível", value: "civel" },
@@ -69,9 +66,6 @@ export default function PageProcess() {
     { label: "Encerrado", value: "encerrado" },
     { label: "Arquivado", value: "arquivado" },
   ]
-
-
-
 
   return (
     <Flex p={4} flexDir="column" gap={5}>
@@ -183,19 +177,28 @@ export default function PageProcess() {
                   </Flex>
                   <Flex flexDir={"column"} gap={2} w={"100%"}>
                     <Field.Root>
-                      <Flex w={"100%"} justifyContent={"space-between"}>
-                        <Field.Label>Partes</Field.Label>
-                        <Flex>
+                      <Flex w={"100%"} flexDir={"column"}>
+                        <Flex justifyContent={"space-between"}>
+                          <Field.Label>Partes</Field.Label>
                           <Button
                             variant={"ghost"}
                             colorPalette={"green"}
                             size={"sm"}
+                            onClick={() =>
+                              setPartes([...partes, { nome: "", papel: "" }])
+                            }
                           >
-                            <Flex gap={2} align={"center"}>
-                              {partes.map((parte) => (
-                                <Flex key={parte.id} gap={2}>
+                            <FaPlus /> Adicionar parte
+                          </Button>
+                        </Flex>
+                        <Flex>
+                          <Flex gap={2} align={"center"} flexDir={"column"}>
+                            {partes.map((parte) => (
+                              <Flex key={parte.nome} gap={2}>
+                                <Flex>
+                                  <Field.Label mr={2}>Nome</Field.Label>
                                   <Input
-                                    placeholder="Nome"
+                                    placeholder="Arnaldo Junior Pereira"
                                     value={parte.nome}
                                     onChange={(e) =>
                                       setPartes([
@@ -204,8 +207,12 @@ export default function PageProcess() {
                                       ])
                                     }
                                   />
+                                </Flex>
+                                <Flex>
+                                  <Field.Label mr={2}>Polo</Field.Label>
+
                                   <Input
-                                    placeholder="Papel"
+                                    placeholder="Reclamante"
                                     value={parte.papel}
                                     onChange={(e) =>
                                       setPartes([
@@ -215,10 +222,9 @@ export default function PageProcess() {
                                     }
                                   />
                                 </Flex>
-                              ))}
-                              <FaPlus /> Adicionar parte
-                            </Flex>
-                          </Button>
+                              </Flex>
+                            ))}
+                          </Flex>
                         </Flex>
                       </Flex>
                     </Field.Root>
