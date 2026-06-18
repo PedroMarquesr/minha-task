@@ -24,6 +24,8 @@ import { FaPlus } from "react-icons/fa"
 export default function PageProcess() {
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
+  const [partes, setPartes] = useState([])
+  const [tags, setTags] = useState([])
   const [process, setProcess] = useState({
     id: uuid(),
     // companyId: "",
@@ -50,6 +52,9 @@ export default function PageProcess() {
     ],
   })
 
+
+
+
   const optionsTypeProcess = [
     { label: "Trabalhista", value: "trabalhista" },
     { label: "Cível", value: "civel" },
@@ -64,6 +69,9 @@ export default function PageProcess() {
     { label: "Encerrado", value: "encerrado" },
     { label: "Arquivado", value: "arquivado" },
   ]
+
+
+
 
   return (
     <Flex p={4} flexDir="column" gap={5}>
@@ -184,6 +192,30 @@ export default function PageProcess() {
                             size={"sm"}
                           >
                             <Flex gap={2} align={"center"}>
+                              {partes.map((parte) => (
+                                <Flex key={parte.id} gap={2}>
+                                  <Input
+                                    placeholder="Nome"
+                                    value={parte.nome}
+                                    onChange={(e) =>
+                                      setPartes([
+                                        ...partes,
+                                        { ...parte, nome: e.target.value },
+                                      ])
+                                    }
+                                  />
+                                  <Input
+                                    placeholder="Papel"
+                                    value={parte.papel}
+                                    onChange={(e) =>
+                                      setPartes([
+                                        ...partes,
+                                        { ...parte, papel: e.target.value },
+                                      ])
+                                    }
+                                  />
+                                </Flex>
+                              ))}
                               <FaPlus /> Adicionar parte
                             </Flex>
                           </Button>
