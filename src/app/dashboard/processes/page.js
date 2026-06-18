@@ -229,8 +229,11 @@ export default function PageProcess() {
                                 p={0.3}
                                 px={3}
                                 w={"100%"}
-                                borderRadius={20}
+                                borderRadius={10}
                                 justify={"space-around"}
+                                _dark={{
+                                  bgColor: "gray.800",
+                                }}
                               >
                                 <Flex>
                                   <Field.Label mr={2}>Nome</Field.Label>
@@ -275,6 +278,7 @@ export default function PageProcess() {
                                     transform: "translateY(-2px)",
                                     transition: "all 0.3s ease",
                                   }}
+
                                 />
                               </Flex>
                             ))}
@@ -284,19 +288,28 @@ export default function PageProcess() {
                       </Flex>
                     </Field.Root>
                     <Field.Root>
-                      <Flex w={"100%"} justifyContent={"space-between"}>
+                      <Flex w={"100%"} justifyContent={"space-between"} flexDir={"column"} gap={2}>
                         <Field.Label>Tags</Field.Label>
                         <Flex>
+                          <Input pr={2} placeholder="Digite uma tag" onChange={(e) => setTags(e.target.value)}
+                          />
                           <Button
                             variant={"ghost"}
                             colorPalette={"purple"}
                             size={"sm"}
+                            ml={3}
+                            onClick={() => {
+                              if (!tags.trim()) return;
+                              setTags((prev) => [tags, ...prev]); // supondo um array `tags`
+                              setTags(""); // limpa o input
+                            }}
                           >
                             <Flex gap={2} align={"center"}>
                               <FaPlus /> Adicionar Tag
                             </Flex>
                           </Button>
                         </Flex>
+                        {JSON.stringify(tags)}
                       </Flex>
                     </Field.Root>
                     {JSON.stringify(process, null, 2)}
@@ -307,7 +320,7 @@ export default function PageProcess() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    ;(setOpenDialog(false),
+                    ; (setOpenDialog(false),
                       setPartes([]),
                       setProcess(defaultProcess))
                   }}
@@ -322,7 +335,7 @@ export default function PageProcess() {
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
-      </Dialog.Root>
-    </Flex>
+      </Dialog.Root >
+    </Flex >
   )
 }
