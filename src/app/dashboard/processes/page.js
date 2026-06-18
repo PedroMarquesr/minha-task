@@ -5,6 +5,7 @@ import {
   Button,
   CloseButton,
   Dialog,
+  Badge,
   Field,
   Input,
   Stack,
@@ -20,13 +21,13 @@ import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ComboboxProcess from "./components/ComboboxProcess/ComboboxProcess"
 import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
-import { color } from "framer-motion"
 
 export default function PageProcess() {
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
   const [partes, setPartes] = useState([])
   const [tags, setTags] = useState([])
+  const [tag, setTag] = useState("")
   const [process, setProcess] = useState({
     id: uuid(),
     // companyId: "",
@@ -39,7 +40,7 @@ export default function PageProcess() {
     processNumber: "",
     typeProcess: "",
     tribunal: "",
-    partes: [{ nome: "", papel: "" }],
+    partes: [{ nome: "", polo: "" }],
     arquivado: false,
     observacoes: "",
     valorCausa: 0,
@@ -221,24 +222,32 @@ export default function PageProcess() {
                             flexDir={"column"}
                             w={"100%"}
                           >
-                            {partes.map((parte, index) => (
+                            {/* {partes.map((parte, index) => (
                               <Flex
                                 key={index}
                                 gap={2}
-                                bgColor={"gray.200"}
+                                shadow={"lg"}
+                                shadowColor={"purple.200"}
+                                bgColor={"purple.200"}
                                 p={0.3}
                                 px={3}
                                 w={"100%"}
                                 borderRadius={10}
                                 justify={"space-around"}
                                 _dark={{
-                                  bgColor: "gray.800",
+                                  bgColor: "purple.900",
+                                  shadowColor: "purple.900",
+                                  boxShadow: "xl",
+                                  border: "2px solid",
+                                  borderColor: "purple.900",
                                 }}
                               >
-                                <Flex>
+                                <Flex align={"center"}>
                                   <Field.Label mr={2}>Nome</Field.Label>
                                   <Input
                                     placeholder="Arnaldo Junior Pereira"
+                                    size={"xs"}
+
                                     value={parte.nome}
                                     onChange={(e) =>
                                       setPartes(
@@ -252,12 +261,13 @@ export default function PageProcess() {
                                   />
                                 </Flex>
 
-                                <Flex>
+                                <Flex align={"center"}>
                                   <Field.Label mr={2}>Polo</Field.Label>
 
                                   <Input
                                     placeholder="Reclamante/Reclamada"
                                     value={parte.polo}
+                                    size={"xs"}
                                     onChange={(e) =>
                                       setPartes(
                                         partes.map((p, i) =>
@@ -281,17 +291,100 @@ export default function PageProcess() {
 
                                 />
                               </Flex>
+                            ))} */}
+
+                            {partes.map((parte, index) => (
+                              <Flex
+                                key={index}
+                                gap={4}
+                                align="center"
+                                w="100%"
+                                p={3}
+                                borderRadius="lg"
+                                bgColor="purple.50"
+                                border="1px solid"
+                                borderColor="purple.100"
+                                _dark={{
+                                  bgColor: "purple.950",
+                                  borderColor: "purple.800",
+                                }}
+                                transition="all 0.2s ease"
+                                _hover={{
+                                  borderColor: "purple.400",
+                                  _dark: { borderColor: "purple.600" },
+                                }}
+                              >
+                                <Field.Root flex={1}>
+                                  <Field.Label fontSize="xs" color="purple.600" _dark={{ color: "purple.300" }}>
+                                    Nome
+                                  </Field.Label>
+                                  <Input
+                                    placeholder="Arnaldo Junior Pereira"
+                                    size="sm"
+                                    bgColor="transparent"
+                                    value={parte.nome}
+                                    onChange={(e) =>
+                                      setPartes(
+                                        partes.map((p, i) =>
+                                          i === index ? { ...p, nome: e.target.value } : p
+                                        )
+                                      )
+                                    }
+                                  />
+                                </Field.Root>
+
+                                <Field.Root flex={1}>
+                                  <Field.Label fontSize="xs" color="purple.600" _dark={{ color: "purple.300" }}>
+                                    Polo
+                                  </Field.Label>
+                                  <Input
+                                    placeholder="Reclamante/Reclamada"
+                                    size="sm"
+                                    bgColor="transparent"
+                                    value={parte.polo}
+                                    onChange={(e) =>
+                                      setPartes(
+                                        partes.map((p, i) =>
+                                          i === index ? { ...p, polo: e.target.value } : p
+                                        )
+                                      )
+                                    }
+                                  />
+                                </Field.Root>
+
+                                <CloseButton
+                                  size="sm"
+                                  color="red.500"
+                                  bgColor="transparent"
+                                  alignSelf="flex-end"
+                                  mb={1}
+                                  _hover={{
+                                    bgColor: "transparent",
+                                    color: "red.400",
+                                    transform: "translateY(-2px)",
+                                    transition: "all 0.2s ease",
+                                  }}
+                                  onClick={() => setPartes(partes.filter((_, i) => i !== index))}
+                                />
+                              </Flex>
                             ))}
                           </Flex>
                         </Flex>
-                        {JSON.stringify(partes)}
                       </Flex>
                     </Field.Root>
                     <Field.Root>
                       <Flex w={"100%"} justifyContent={"space-between"} flexDir={"column"} gap={2}>
                         <Field.Label>Tags</Field.Label>
                         <Flex>
-                          <Input pr={2} placeholder="Digite uma tag" onChange={(e) => setTags(e.target.value)}
+                          <Input pr={2} placeholder="Digite uma tag" value={tag}
+                            onChange={(e) => setTag(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                if (!tag.trim()) return;
+                                setTags((prev) => [tag, ...prev]);
+                                setTag("");
+                              }
+                            }}
                           />
                           <Button
                             variant={"ghost"}
@@ -299,9 +392,9 @@ export default function PageProcess() {
                             size={"sm"}
                             ml={3}
                             onClick={() => {
-                              if (!tags.trim()) return;
-                              setTags((prev) => [tags, ...prev]); // supondo um array `tags`
-                              setTags(""); // limpa o input
+                              if (!tag.trim()) return;
+                              setTags((prev) => [tag, ...prev]);
+                              setTag("");
                             }}
                           >
                             <Flex gap={2} align={"center"}>
@@ -309,7 +402,44 @@ export default function PageProcess() {
                             </Flex>
                           </Button>
                         </Flex>
-                        {JSON.stringify(tags)}
+                        {/* <Flex flexWrap={"wrap"}>
+                          {tags.length > 0 && (
+                            tags.map((tag, index) => (
+                              <Flex key={index} mb={1}>
+                                <Badge size='lg' colorPalette="purple" mr={2}>{tag}
+                                  <CloseButton size="xs" colorPalette="purple" variant="ghost" />
+                                </Badge>
+                              </Flex>
+                            ))
+                          )}
+                        </Flex> */}
+                        <Flex flexWrap="wrap" gap={2} mt={1}>
+                          {tags.length > 0 &&
+                            tags.map((t, index) => (
+                              <Badge
+                                key={index}
+                                size="lg"
+                                colorPalette="purple"
+                                variant="surface"
+                                borderRadius="full"
+                                display="flex"
+                                alignItems="center"
+                                gap={1.5}
+                                fontWeight="medium"
+                                _hover={{ bgColor: "purple.700", color: "white" }}
+                                transition="all 0.2s ease"
+                              >
+                                {t}
+                                <CloseButton
+                                  size="2xs"
+                                  colorPalette="purple"
+                                  variant="ghost"
+                                  borderRadius="full"
+                                  onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                                />
+                              </Badge>
+                            ))}
+                        </Flex>
                       </Flex>
                     </Field.Root>
                     {JSON.stringify(process, null, 2)}
@@ -322,6 +452,7 @@ export default function PageProcess() {
                   onClick={() => {
                     ; (setOpenDialog(false),
                       setPartes([]),
+                      setTags([]),
                       setProcess(defaultProcess))
                   }}
                 >
