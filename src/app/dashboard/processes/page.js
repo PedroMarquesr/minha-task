@@ -25,7 +25,7 @@ import {
 import ProcessesSimpleCardsContainer from "./components/ProcessesSimpleCardsContainer/ProcessesSimpleCardsContainer"
 import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ComboboxProcess from "./components/ComboboxProcess/ComboboxProcess"
-import ContainerProcess from "./components/ContainerProcess/ContainerProcess"
+import ContainerProcesses from "./components/ContainerProcess/ContainerProcesses"
 import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
 import { useStore } from "@/hooks/useStore"
@@ -107,10 +107,6 @@ export default function PageProcess() {
     }
   }
 
-  // Antes: fetchProcesses usava getDocs, que não estava importado.
-  // O erro era engolido pelo catch e a lista nunca era preenchida.
-  // Trocado por onSnapshot (já estava importado e não era usado),
-  // assim a lista atualiza sozinha sempre que o Firestore mudar.
   useEffect(() => {
     if (!user?.companyId) return
 
@@ -176,13 +172,7 @@ export default function PageProcess() {
       </Flex>
       <ProcessesSimpleCardsContainer />
 
-      {processes.length > 0 && (
-        <ContainerProcess
-          numeroprocess={processes[0].processNumber}
-          tipo={processes[0].typeProcess}
-          status={processes[0].status}
-        />
-      )}
+      <ContainerProcesses />
 
       <Dialog.Root motionPreset={"slide-in-bottom"} open={openDialog}>
         <Portal>
