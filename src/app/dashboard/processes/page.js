@@ -21,8 +21,9 @@ import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ComboboxProcess from "./components/ComboboxProcess/ComboboxProcess"
 import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
-
+import { useStore } from "@/hooks/useStore"
 export default function PageProcess() {
+  const { user } = useStore()
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
   const [partes, setPartes] = useState([])
@@ -30,11 +31,11 @@ export default function PageProcess() {
   const [tag, setTag] = useState("")
   const [process, setProcess] = useState({
     id: uuid(),
-    // companyId: "",
+    companyId: user?.companyId || null,
     createdAt: new Date(),
-    updatedAt: new Date(),
-    // userCreator: user.displayName
-    // creatorId: user.uid
+    updatedAt: [],
+    userCreator: user.displayName || "",
+    creatorId: user.uid,
     tags: [],
     status: "",
     processNumber: "",
@@ -55,11 +56,11 @@ export default function PageProcess() {
   })
   const defaultProcess = {
     id: uuid(),
-    // companyId: "",
+    companyId: user?.companyId || null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    // userCreator: user.displayName
-    // creatorId: user.uid
+    userCreator: user.displayName || "",
+    creatorId: user.uid,
     tags: [],
     status: "",
     processNumber: "",
@@ -137,6 +138,9 @@ export default function PageProcess() {
         </Flex>
       </Flex>
       <ProcessesSimpleCardsContainer />
+
+
+
       <Dialog.Root motionPreset={"slide-in-bottom"} open={openDialog}>
         <Portal>
           <Dialog.Backdrop backdropFilter={"blur(4px)"} />
@@ -222,76 +226,7 @@ export default function PageProcess() {
                             flexDir={"column"}
                             w={"100%"}
                           >
-                            {/* {partes.map((parte, index) => (
-                              <Flex
-                                key={index}
-                                gap={2}
-                                shadow={"lg"}
-                                shadowColor={"purple.200"}
-                                bgColor={"purple.200"}
-                                p={0.3}
-                                px={3}
-                                w={"100%"}
-                                borderRadius={10}
-                                justify={"space-around"}
-                                _dark={{
-                                  bgColor: "purple.900",
-                                  shadowColor: "purple.900",
-                                  boxShadow: "xl",
-                                  border: "2px solid",
-                                  borderColor: "purple.900",
-                                }}
-                              >
-                                <Flex align={"center"}>
-                                  <Field.Label mr={2}>Nome</Field.Label>
-                                  <Input
-                                    placeholder="Arnaldo Junior Pereira"
-                                    size={"xs"}
 
-                                    value={parte.nome}
-                                    onChange={(e) =>
-                                      setPartes(
-                                        partes.map((p, i) =>
-                                          i === index
-                                            ? { ...p, nome: e.target.value }
-                                            : p,
-                                        ),
-                                      )
-                                    }
-                                  />
-                                </Flex>
-
-                                <Flex align={"center"}>
-                                  <Field.Label mr={2}>Polo</Field.Label>
-
-                                  <Input
-                                    placeholder="Reclamante/Reclamada"
-                                    value={parte.polo}
-                                    size={"xs"}
-                                    onChange={(e) =>
-                                      setPartes(
-                                        partes.map((p, i) =>
-                                          i === index
-                                            ? { ...p, polo: e.target.value }
-                                            : p,
-                                        ),
-                                      )
-                                    }
-                                  />
-                                </Flex>
-                                <CloseButton
-                                  color={"red.500"}
-                                  bgColor={"transparent"}
-                                  _hover={{
-                                    bgColor: "transparent",
-                                    color: "red.400",
-                                    transform: "translateY(-2px)",
-                                    transition: "all 0.3s ease",
-                                  }}
-
-                                />
-                              </Flex>
-                            ))} */}
 
                             {partes.map((parte, index) => (
                               <Flex
@@ -402,17 +337,7 @@ export default function PageProcess() {
                             </Flex>
                           </Button>
                         </Flex>
-                        {/* <Flex flexWrap={"wrap"}>
-                          {tags.length > 0 && (
-                            tags.map((tag, index) => (
-                              <Flex key={index} mb={1}>
-                                <Badge size='lg' colorPalette="purple" mr={2}>{tag}
-                                  <CloseButton size="xs" colorPalette="purple" variant="ghost" />
-                                </Badge>
-                              </Flex>
-                            ))
-                          )}
-                        </Flex> */}
+
                         <Flex flexWrap="wrap" gap={2} mt={1}>
                           {tags.length > 0 &&
                             tags.map((t, index) => (
@@ -461,7 +386,6 @@ export default function PageProcess() {
                 <Button>Salvar</Button>
               </Dialog.Footer>
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
               </Dialog.CloseTrigger>
             </Dialog.Content>
           </Dialog.Positioner>
