@@ -8,28 +8,39 @@ import {
   Badge,
   Field,
   Input,
-  Stack,
-  Combobox,
   Portal,
-  useFilter,
-  useListCollection,
-  IconButton,
 } from "@chakra-ui/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import {
+  addDoc,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore"
+
 import ProcessesSimpleCardsContainer from "./components/ProcessesSimpleCardsContainer/ProcessesSimpleCardsContainer"
 import AlertCustom from "../components/AlertCustom/AlertCustom"
 import ComboboxProcess from "./components/ComboboxProcess/ComboboxProcess"
+import ContainerProcesses from "./components/ContainerProcess/ContainerProcesses"
 import { v4 as uuid } from "uuid"
 import { FaPlus } from "react-icons/fa"
 import { useStore } from "@/hooks/useStore"
+
+import { db } from "@/lib/firebase"
+
 export default function PageProcess() {
   const { user } = useStore()
   const [showAlert, setShowAlert] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
-  const [partes, setPartes] = useState([])
+  const [partes, setPartes] = useState([{ nome: "", polo: "" }])
   const [tags, setTags] = useState([])
   const [tag, setTag] = useState("")
-  const [process, setProcess] = useState({
+
+  const getDefaultProcess = () => ({
     id: uuid(),
     companyId: user?.companyId || null,
     createdAt: new Date(),
@@ -41,6 +52,8 @@ export default function PageProcess() {
     processNumber: "",
     typeProcess: "",
     tribunal: "",
+    cidade: "",
+    estado: "",
     partes: [{ nome: "", polo: "" }],
     arquivado: false,
     observacoes: "",
@@ -54,31 +67,10 @@ export default function PageProcess() {
       },
     ],
   })
-  const defaultProcess = {
-    id: uuid(),
-    companyId: user?.companyId || null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    userCreator: user?.displayName || "",
-    creatorId: user?.uid || "",
-    tags: [],
-    status: "",
-    processNumber: "",
-    typeProcess: "",
-    tribunal: "",
-    partes: [{ nome: "", papel: "" }],
-    arquivado: false,
-    observacoes: "",
-    valorCausa: 0,
-    custos: [
-      {
-        descricao: "",
-        valor: 0,
-        tipo: "",
-        data: new Date(),
-      },
-    ],
-  }
+
+  const [process, setProcess] = useState(getDefaultProcess)
+  const [processes, setProcesses] = useState([])
+
   const optionsTypeProcess = [
     { label: "Trabalhista", value: "trabalhista" },
     { label: "Cível", value: "civel" },
@@ -93,6 +85,47 @@ export default function PageProcess() {
     { label: "Encerrado", value: "encerrado" },
     { label: "Arquivado", value: "arquivado" },
   ]
+
+  const handleCreateProcess = async () => {
+    try {
+      await setDoc(doc(db, "processes", process.id), {
+        ...process,
+        partes: partes.filter((parte) => parte.nome !== ""),
+        tags: tags.filter((t) => t !== ""),
+      })
+      setOpenDialog(false)
+      setProcess(getDefaultProcess())
+      setPartes([{ nome: "", polo: "" }])
+      setTag("")
+      setTags([])
+      setShowAlert(true)
+      setTimeout(() => {
+        setShowAlert(false)
+      }, 3000)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    if (!user?.companyId) return
+
+    const q = query(
+      collection(db, "processes"),
+      where("companyId", "==", user.companyId),
+    )
+
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const data = querySnapshot.docs.map((d) => d.data())
+        setProcesses(data)
+      },
+      (err) => console.log(err),
+    )
+
+    return () => unsubscribe()
+  }, [user?.companyId])
 
   return (
     <Flex p={4} flexDir="column" gap={5}>
@@ -139,7 +172,7 @@ export default function PageProcess() {
       </Flex>
       <ProcessesSimpleCardsContainer />
 
-
+      <ContainerProcesses />
 
       <Dialog.Root motionPreset={"slide-in-bottom"} open={openDialog}>
         <Portal>
@@ -150,7 +183,6 @@ export default function PageProcess() {
                 <Dialog.Title>Novo Processo</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
-                {/* Aqui !!!!!!!!!!!!!!*/}
                 <Flex flexDir={"column"} gap={2} w={"100%"}>
                   <Field.Root>
                     <Field.Label>Número do Processo</Field.Label>
@@ -191,6 +223,28 @@ export default function PageProcess() {
                       }
                     />
                   </Flex>
+                  <Flex gap={2} w={"100%"}>
+                    <Field.Root>
+                      <Field.Label>Cidade</Field.Label>
+                      <Input
+                        placeholder="Santos"
+                        value={process.cidade}
+                        onChange={(e) =>
+                          setProcess({ ...process, cidade: e.target.value })
+                        }
+                      />
+                    </Field.Root>
+                    <Field.Root>
+                      <Field.Label>Estado</Field.Label>
+                      <Input
+                        placeholder="São Paulo"
+                        value={process.estado}
+                        onChange={(e) =>
+                          setProcess({ ...process, estado: e.target.value })
+                        }
+                      />
+                    </Field.Root>
+                  </Flex>
                   <Flex flexDir={"column"} gap={2} w={"100%"}>
                     <Field.Root>
                       <Field.Label>Tribunal</Field.Label>
@@ -226,8 +280,6 @@ export default function PageProcess() {
                             flexDir={"column"}
                             w={"100%"}
                           >
-
-
                             {partes.map((parte, index) => (
                               <Flex
                                 key={index}
@@ -250,7 +302,11 @@ export default function PageProcess() {
                                 }}
                               >
                                 <Field.Root flex={1}>
-                                  <Field.Label fontSize="xs" color="purple.600" _dark={{ color: "purple.300" }}>
+                                  <Field.Label
+                                    fontSize="xs"
+                                    color="purple.600"
+                                    _dark={{ color: "purple.300" }}
+                                  >
                                     Nome
                                   </Field.Label>
                                   <Input
@@ -261,15 +317,21 @@ export default function PageProcess() {
                                     onChange={(e) =>
                                       setPartes(
                                         partes.map((p, i) =>
-                                          i === index ? { ...p, nome: e.target.value } : p
-                                        )
+                                          i === index
+                                            ? { ...p, nome: e.target.value }
+                                            : p,
+                                        ),
                                       )
                                     }
                                   />
                                 </Field.Root>
 
                                 <Field.Root flex={1}>
-                                  <Field.Label fontSize="xs" color="purple.600" _dark={{ color: "purple.300" }}>
+                                  <Field.Label
+                                    fontSize="xs"
+                                    color="purple.600"
+                                    _dark={{ color: "purple.300" }}
+                                  >
                                     Polo
                                   </Field.Label>
                                   <Input
@@ -280,8 +342,10 @@ export default function PageProcess() {
                                     onChange={(e) =>
                                       setPartes(
                                         partes.map((p, i) =>
-                                          i === index ? { ...p, polo: e.target.value } : p
-                                        )
+                                          i === index
+                                            ? { ...p, polo: e.target.value }
+                                            : p,
+                                        ),
                                       )
                                     }
                                   />
@@ -299,7 +363,11 @@ export default function PageProcess() {
                                     transform: "translateY(-2px)",
                                     transition: "all 0.2s ease",
                                   }}
-                                  onClick={() => setPartes(partes.filter((_, i) => i !== index))}
+                                  onClick={() =>
+                                    setPartes(
+                                      partes.filter((_, i) => i !== index),
+                                    )
+                                  }
                                 />
                               </Flex>
                             ))}
@@ -308,16 +376,24 @@ export default function PageProcess() {
                       </Flex>
                     </Field.Root>
                     <Field.Root>
-                      <Flex w={"100%"} justifyContent={"space-between"} flexDir={"column"} gap={2}>
+                      <Flex
+                        w={"100%"}
+                        justifyContent={"space-between"}
+                        flexDir={"column"}
+                        gap={2}
+                      >
                         <Field.Label>Tags</Field.Label>
                         <Flex>
-                          <Input pr={2} placeholder="Digite uma tag" value={tag}
+                          <Input
+                            pr={2}
+                            placeholder="Digite uma tag"
+                            value={tag}
                             onChange={(e) => setTag(e.target.value)}
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
-                                if (!tag.trim()) return;
-                                setTags((prev) => [tag, ...prev]);
-                                setTag("");
+                                if (!tag.trim()) return
+                                setTags((prev) => [tag, ...prev])
+                                setTag("")
                               }
                             }}
                           />
@@ -327,9 +403,9 @@ export default function PageProcess() {
                             size={"sm"}
                             ml={3}
                             onClick={() => {
-                              if (!tag.trim()) return;
-                              setTags((prev) => [tag, ...prev]);
-                              setTag("");
+                              if (!tag.trim()) return
+                              setTags((prev) => [tag, ...prev])
+                              setTag("")
                             }}
                           >
                             <Flex gap={2} align={"center"}>
@@ -351,7 +427,10 @@ export default function PageProcess() {
                                 alignItems="center"
                                 gap={1.5}
                                 fontWeight="medium"
-                                _hover={{ bgColor: "purple.700", color: "white" }}
+                                _hover={{
+                                  bgColor: "purple.700",
+                                  color: "white",
+                                }}
                                 transition="all 0.2s ease"
                               >
                                 {t}
@@ -360,14 +439,15 @@ export default function PageProcess() {
                                   colorPalette="purple"
                                   variant="ghost"
                                   borderRadius="full"
-                                  onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                                  onClick={() =>
+                                    setTags(tags.filter((_, i) => i !== index))
+                                  }
                                 />
                               </Badge>
                             ))}
                         </Flex>
                       </Flex>
                     </Field.Root>
-                    {JSON.stringify(process, null, 2)}
                   </Flex>
                 </Flex>
               </Dialog.Body>
@@ -375,22 +455,22 @@ export default function PageProcess() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    ; (setOpenDialog(false),
-                      setPartes([]),
-                      setTags([]),
-                      setProcess(defaultProcess))
+                    setOpenDialog(false)
+                    setPartes([{ nome: "", polo: "" }])
+                    setTags([])
+                    setTag("")
+                    setProcess(getDefaultProcess())
                   }}
                 >
                   Fechar
                 </Button>
-                <Button>Salvar</Button>
+                <Button onClick={handleCreateProcess}>Salvar</Button>
               </Dialog.Footer>
-              <Dialog.CloseTrigger asChild>
-              </Dialog.CloseTrigger>
+              <Dialog.CloseTrigger asChild></Dialog.CloseTrigger>
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>
-      </Dialog.Root >
-    </Flex >
+      </Dialog.Root>
+    </Flex>
   )
 }
