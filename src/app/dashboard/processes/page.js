@@ -14,7 +14,7 @@ import { useState, useEffect } from "react"
 import {
   addDoc,
   doc,
-  getDoc,
+  getDocs,
   setDoc,
   collection,
   query,
@@ -107,6 +107,29 @@ export default function PageProcess() {
     }
   }
 
+
+  //Aqui
+
+  useEffect(() => {
+    if (!user?.companyId) return
+
+    const q = query(
+      collection(db, "processes"),
+      where("companyId", "==", user.companyId),
+    )
+
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const data = querySnapshot.docs.map((d) => d.data())
+        setProcesses(data)
+      },
+      (err) => console.log(err),
+    )
+
+    return () => unsubscribe()
+  }, [user?.companyId])
+
   useEffect(() => {
     if (!user?.companyId) return
 
@@ -173,6 +196,7 @@ export default function PageProcess() {
       <ProcessesSimpleCardsContainer />
 
       <ContainerProcesses />
+      {JSON.stringify(processes)}
 
       <Dialog.Root motionPreset={"slide-in-bottom"} open={openDialog}>
         <Portal>
