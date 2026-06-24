@@ -107,7 +107,6 @@ export default function PageProcess() {
     }
   }
 
-
   //Aqui
 
   useEffect(() => {
@@ -195,8 +194,7 @@ export default function PageProcess() {
       </Flex>
       <ProcessesSimpleCardsContainer />
 
-      <ContainerProcesses />
-      {JSON.stringify(processes)}
+      <ContainerProcesses processes={processes} />
 
       <Dialog.Root motionPreset={"slide-in-bottom"} open={openDialog}>
         <Portal>

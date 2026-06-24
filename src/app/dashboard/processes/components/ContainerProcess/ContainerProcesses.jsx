@@ -3,11 +3,12 @@
 import { Flex, Text, Icon, Accordion } from "@chakra-ui/react"
 import { GoLaw } from "react-icons/go"
 import { FaCheck, FaArchive } from "react-icons/fa"
+import ProcessCard from "./components/ProcessCard/ProcessCard"
 
 export default function ContainerProcesses({ processes = [] }) {
-  const emAndamento = processes.filter((p) => p.status === "em-andamento")
-  const encerrados = processes.filter((p) => p.status === "encerrados")
-  const arquivados = processes.filter((p) => p.status === "arquivados")
+  const emAndamento = processes.filter((p) => p.status === "em_andamento")
+  const encerrados = processes.filter((p) => p.status === "encerrado")
+  const arquivados = processes.filter((p) => p.status === "arquivado")
 
   return (
     <Flex w={"100%"} flexDir={"column"} gap={3}>
@@ -34,11 +35,27 @@ export default function ContainerProcesses({ processes = [] }) {
               bg="purple.50"
               _dark={{ bg: "purple.900/40" }}
             >
-              <Icon as={GoLaw} boxSize={4} color="purple.700" _dark={{ color: "purple.300" }} />
-              <Text fontWeight="semibold" ml={4} color="purple.900" _dark={{ color: "purple.100" }} flex="1">
+              <Icon
+                as={GoLaw}
+                boxSize={4}
+                color="purple.700"
+                _dark={{ color: "purple.300" }}
+              />
+
+              <Text
+                fontWeight="semibold"
+                ml={4}
+                color="purple.900"
+                _dark={{ color: "purple.100" }}
+                flex="1"
+              >
                 Em andamento ({emAndamento.length})
               </Text>
-              <Accordion.ItemIndicator color="purple.700" _dark={{ color: "purple.300" }} />
+
+              <Accordion.ItemIndicator
+                color="purple.700"
+                _dark={{ color: "purple.300" }}
+              />
             </Accordion.ItemTrigger>
 
             <Accordion.ItemContent>
@@ -55,13 +72,12 @@ export default function ContainerProcesses({ processes = [] }) {
                     </Text>
                   ) : (
                     emAndamento.map((process) => (
-                      <Text
-                        key={process.id}
-                        color={"gray.700"}
-                        _dark={{ color: "gray.200" }}
-                      >
-                        {process.processNumber}
-                      </Text>
+                      <ProcessCard
+                        processId={process.id}
+                        processNumber={process.processNumber}
+                        processType={process.typeProcess}
+                        tribunal={process.tribunal}
+                      />
                     ))
                   )}
                 </Flex>
@@ -93,11 +109,25 @@ export default function ContainerProcesses({ processes = [] }) {
               bg="green.50"
               _dark={{ bg: "green.900/40" }}
             >
-              <Icon as={FaCheck} boxSize={4} color="green.700" _dark={{ color: "green.300" }} />
-              <Text fontWeight="semibold" ml={4} color="green.900" _dark={{ color: "green.100" }} flex="1">
+              <Icon
+                as={FaCheck}
+                boxSize={4}
+                color="green.700"
+                _dark={{ color: "green.300" }}
+              />
+              <Text
+                fontWeight="semibold"
+                ml={4}
+                color="green.900"
+                _dark={{ color: "green.100" }}
+                flex="1"
+              >
                 Encerrados ({encerrados.length})
               </Text>
-              <Accordion.ItemIndicator color="green.700" _dark={{ color: "green.300" }} />
+              <Accordion.ItemIndicator
+                color="green.700"
+                _dark={{ color: "green.300" }}
+              />
             </Accordion.ItemTrigger>
 
             <Accordion.ItemContent>
@@ -152,11 +182,25 @@ export default function ContainerProcesses({ processes = [] }) {
               bg="blue.50"
               _dark={{ bg: "blue.900/40" }}
             >
-              <Icon as={FaArchive} boxSize={4} color="blue.700" _dark={{ color: "blue.300" }} />
-              <Text fontWeight="semibold" ml={4} color="blue.900" _dark={{ color: "blue.100" }} flex="1">
+              <Icon
+                as={FaArchive}
+                boxSize={4}
+                color="blue.700"
+                _dark={{ color: "blue.300" }}
+              />
+              <Text
+                fontWeight="semibold"
+                ml={4}
+                color="blue.900"
+                _dark={{ color: "blue.100" }}
+                flex="1"
+              >
                 Arquivados ({arquivados.length})
               </Text>
-              <Accordion.ItemIndicator color="blue.700" _dark={{ color: "blue.300" }} />
+              <Accordion.ItemIndicator
+                color="blue.700"
+                _dark={{ color: "blue.300" }}
+              />
             </Accordion.ItemTrigger>
 
             <Accordion.ItemContent>
