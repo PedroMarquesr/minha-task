@@ -42,7 +42,8 @@ export default function SimpleCard({
           align={{ base: "center", md: "start" }}
           justify={"center"}
           w={{ base: "full", md: "auto" }}
-          bg={{ base: bgIconColor, _dark: bgIconColor, md: "none" }}
+          bg={{ base: bgIconColor, md: "none" }}
+          _dark={{ bg: { base: bgIconColor, md: "none" } }}
         >
           <Text
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"

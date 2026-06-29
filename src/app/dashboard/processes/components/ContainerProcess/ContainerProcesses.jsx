@@ -73,11 +73,13 @@ export default function ContainerProcesses({ processes = [] }) {
                   ) : (
                     emAndamento.map((process) => (
                       <ProcessCard
+                        key={process.id}
                         status={process.status}
                         processId={process.id}
                         processNumber={process.processNumber}
                         processType={process.typeProcess}
                         tribunal={process.tribunal}
+                        partes={process.partes}
                       />
                     ))
                   )}
@@ -146,12 +148,14 @@ export default function ContainerProcesses({ processes = [] }) {
                   ) : (
                     encerrados.map((process) => (
                       <ProcessCard
+                        key={process.id}
                         status={process.status}
 
                         processId={process.id}
                         processNumber={process.processNumber}
                         processType={process.typeProcess}
                         tribunal={process.tribunal}
+                        partes={process.partes}
                       />
                     ))
                   )}
@@ -220,12 +224,14 @@ export default function ContainerProcesses({ processes = [] }) {
                   ) : (
                     arquivados.map((process) => (
                       <ProcessCard
+                        key={process.id}
                         status={process.status}
 
                         processId={process.id}
                         processNumber={process.processNumber}
                         processType={process.typeProcess}
                         tribunal={process.tribunal}
+                        partes={process.partes}
                       />
                     ))
                   )}
