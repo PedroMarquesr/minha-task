@@ -47,13 +47,7 @@ export default function ProcessCard({
       key={processId}
       flexDir={"column"}
       border="1px solid"
-      // borderColor={handleColorStatus(status).borderColor}
-      //_dark={handleColorStatus(status)._dark}
-      // _hover={{
-      //   borderColor: handleColorStatus(status)._hover.borderColor,
-      //   bg: handleColorStatus(status)._hover.bg,
-      //   _dark: handleColorStatus(status)._hover._dark,
-      // }}
+
       borderRadius={"md"}
       p={2}
       gap={1}
@@ -74,6 +68,9 @@ export default function ProcessCard({
         <Text>-</Text>
 
         <Text>{tribunal}</Text>
+      </Flex>
+      <Flex>
+        <Text>Conteudo do card em accordiom</Text>
       </Flex>
     </Flex>
   )
