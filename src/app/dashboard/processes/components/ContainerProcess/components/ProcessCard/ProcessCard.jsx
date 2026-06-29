@@ -1,6 +1,6 @@
-import { Flex, Text, Accordion } from "@chakra-ui/react"
+import { Flex, Text, Accordion, Badge } from "@chakra-ui/react"
 import { useState } from "react";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { FaAngleDown, FaAngleUp, FaRegUser } from "react-icons/fa";
 
 
 export default function ProcessCard({
@@ -9,6 +9,7 @@ export default function ProcessCard({
   processType,
   tribunal,
   status,
+  partes = []
 }) {
 
 
@@ -82,7 +83,38 @@ export default function ProcessCard({
 
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
-              <Text>Conteudo do card em accordiom</Text>
+
+
+              <Flex p={3}>
+                <Flex flexDir={"column"}><Text>PARTES</Text>
+
+                  <Flex gap={1} >
+                    {
+                      partes.map((parte, index) => {
+                        return (
+                          <Flex key={index} gap={2} p={2} align={"center"} border={"1px solid"} borderRadius={"md"} borderColor={handleColorStatus(status).borderColor} >
+
+                            <Text color={"gray.500"} _dark={{ color: "gray.200" }} >
+                              <FaRegUser />
+                            </Text>
+                            <Text fontSize={"xs"} color={"gray.700"} _dark={{ color: "gray.200" }}>
+                              {parte.nome}</Text>
+                            <Badge colorPalette={"purple"} variant="outline" >
+                              {parte.polo}</Badge>
+
+
+                          </Flex>
+                        )
+                      })
+                    }
+
+
+
+
+
+                  </Flex>
+                </Flex>
+              </Flex>
             </Accordion.ItemContent>
           </Accordion.Item>
         </Accordion.Root>

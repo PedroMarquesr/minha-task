@@ -40,17 +40,25 @@ export default function SimpleCard({
           flexDir="column"
           p={{ base: 0, md: 5 }}
           align={{ base: "center", md: "start" }}
+          justify={"center"}
+          w={{ base: "full", md: "auto" }}
+          bg={{ base: bgIconColor, md: "none" }}
+          _dark={{ bg: { base: bgIconColor, md: "none" } }}
         >
           <Text
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
+
             textAlign={"center"}
-            borderRadius={{ base: "none", md: "lg" }}
-            pt={{ base: 3, md: 0 }}
+            borderRadius={{ base: "none", lg: "lg" }}
+            pt={{ base: 3, lg: 0 }}
+            _dark={{ color: "gray.900" }}
           >
             {title}
           </Text>
 
-          <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)">
+          <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
+            _dark={{ textShadow: "0px 0px 2px rgba(255, 255, 255, 1)" }}
+          >
             {quantity}
           </Text>
         </Flex>
