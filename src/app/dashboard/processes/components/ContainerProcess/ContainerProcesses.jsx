@@ -73,6 +73,7 @@ export default function ContainerProcesses({ processes = [] }) {
                   ) : (
                     emAndamento.map((process) => (
                       <ProcessCard
+                        status={process.status}
                         processId={process.id}
                         processNumber={process.processNumber}
                         processType={process.typeProcess}
@@ -144,13 +145,14 @@ export default function ContainerProcesses({ processes = [] }) {
                     </Text>
                   ) : (
                     encerrados.map((process) => (
-                      <Text
-                        key={process.id}
-                        color={"gray.700"}
-                        _dark={{ color: "gray.200" }}
-                      >
-                        {process.processNumber}
-                      </Text>
+                      <ProcessCard
+                        status={process.status}
+
+                        processId={process.id}
+                        processNumber={process.processNumber}
+                        processType={process.typeProcess}
+                        tribunal={process.tribunal}
+                      />
                     ))
                   )}
                 </Flex>
@@ -217,13 +219,14 @@ export default function ContainerProcesses({ processes = [] }) {
                     </Text>
                   ) : (
                     arquivados.map((process) => (
-                      <Text
-                        key={process.id}
-                        color={"gray.700"}
-                        _dark={{ color: "gray.200" }}
-                      >
-                        {process.processNumber}
-                      </Text>
+                      <ProcessCard
+                        status={process.status}
+
+                        processId={process.id}
+                        processNumber={process.processNumber}
+                        processType={process.typeProcess}
+                        tribunal={process.tribunal}
+                      />
                     ))
                   )}
                 </Flex>
