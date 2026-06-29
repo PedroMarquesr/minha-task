@@ -1,4 +1,7 @@
-import { Flex, Text } from "@chakra-ui/react"
+import { Flex, Text, Accordion } from "@chakra-ui/react"
+import { useState } from "react";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+
 
 export default function ProcessCard({
   processNumber,
@@ -7,6 +10,8 @@ export default function ProcessCard({
   tribunal,
   status,
 }) {
+
+
   const handleColorStatus = (status) => {
     switch (status) {
       case "em_andamento":
@@ -70,7 +75,17 @@ export default function ProcessCard({
         <Text>{tribunal}</Text>
       </Flex>
       <Flex>
-        <Text>Conteudo do card em accordiom</Text>
+        <Accordion.Root collapsible>
+          <Accordion.Item>
+            <Accordion.ItemTrigger>
+              <Accordion.ItemIndicator />
+
+            </Accordion.ItemTrigger>
+            <Accordion.ItemContent>
+              <Text>Conteudo do card em accordiom</Text>
+            </Accordion.ItemContent>
+          </Accordion.Item>
+        </Accordion.Root>
       </Flex>
     </Flex>
   )
