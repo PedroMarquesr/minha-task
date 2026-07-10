@@ -1,7 +1,6 @@
 import { Flex, Text, Accordion, Badge } from "@chakra-ui/react"
-import { useState } from "react";
-import { FaAngleDown, FaAngleUp, FaRegUser } from "react-icons/fa";
-
+import { useState } from "react"
+import { FaAngleDown, FaAngleUp, FaRegUser } from "react-icons/fa"
 
 export default function ProcessCard({
   processNumber,
@@ -9,10 +8,10 @@ export default function ProcessCard({
   processType,
   tribunal,
   status,
-  partes = []
+  partes = [],
+  tags = [],
+  events = [],
 }) {
-
-
   const handleColorStatus = (status) => {
     switch (status) {
       case "em_andamento":
@@ -53,65 +52,105 @@ export default function ProcessCard({
       key={processId}
       flexDir={"column"}
       border="1px solid"
-
       borderRadius={"md"}
       p={2}
       gap={1}
       {...handleColorStatus(status)}
-
-
     >
       <Text key={processId} color={"gray.700"} _dark={{ color: "gray.200" }}>
         {processNumber}
       </Text>
-      <Flex
-        gap={2}
-        fontSize={"xs"}
-        color={"gray.600"}
-        _dark={{ color: "gray.300" }}
-      >
-        <Text>{processType} </Text>
-        <Text>-</Text>
+      <Flex align={"center"} gap={2}>
+        <Flex
+          gap={2}
+          fontSize={"xs"}
+          color={"gray.600"}
+          _dark={{ color: "gray.300" }}
+        >
+          <Text>{processType} </Text>
+          <Text>-</Text>
 
-        <Text>{tribunal}</Text>
+          <Text>{tribunal}</Text>
+        </Flex>
+        <Flex justify={"center"} gap={1}>
+          {tags.length > 0 &&
+            tags.map((tag, index) => {
+              return (
+                <Flex key={index} gap={2}>
+                  <Badge
+                    colorPalette={
+                      status === "encerrado"
+                        ? "green"
+                        : status === "arquivado"
+                          ? "blue"
+                          : "purple"
+                    }
+                    variant={"surface"}
+                  >
+                    {tag}
+                  </Badge>
+                </Flex>
+              )
+            })}
+        </Flex>
       </Flex>
       <Flex>
         <Accordion.Root collapsible>
           <Accordion.Item>
             <Accordion.ItemTrigger>
               <Accordion.ItemIndicator />
-
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
+              <Flex p={3} flexDir={"column"} gap={2}>
+                <Flex flexDir={"column"}>
+                  <Text>Partes</Text>
 
+                  <Flex gap={1}>
+                    {partes.map((parte, index) => {
+                      return (
+                        <Flex
+                          key={index}
+                          gap={2}
+                          p={2}
+                          align={"center"}
+                          border={"1px solid"}
+                          borderRadius={"md"}
+                          borderColor={handleColorStatus(status).borderColor}
+                        >
+                          <Text
+                            color={"gray.500"}
+                            _dark={{ color: "gray.200" }}
+                          >
+                            <FaRegUser />
+                          </Text>
+                          <Text
+                            fontSize={"xs"}
+                            color={"gray.700"}
+                            _dark={{ color: "gray.200" }}
+                          >
+                            {parte.nome}
+                          </Text>
+                          <Badge colorPalette={"purple"} variant="outline">
+                            {parte.polo}
+                          </Badge>
+                        </Flex>
+                      )
+                    })}
+                  </Flex>
+                </Flex>
+                <Flex flexDir={"column"}>
+                  <Text>Eventos</Text>
 
-              <Flex p={3}>
-                <Flex flexDir={"column"}><Text>PARTES</Text>
-
-                  <Flex gap={1} >
-                    {
-                      partes.map((parte, index) => {
-                        return (
-                          <Flex key={index} gap={2} p={2} align={"center"} border={"1px solid"} borderRadius={"md"} borderColor={handleColorStatus(status).borderColor} >
-
-                            <Text color={"gray.500"} _dark={{ color: "gray.200" }} >
-                              <FaRegUser />
-                            </Text>
-                            <Text fontSize={"xs"} color={"gray.700"} _dark={{ color: "gray.200" }}>
-                              {parte.nome}</Text>
-                            <Badge colorPalette={"purple"} variant="outline" >
-                              {parte.polo}</Badge>
-
-
-                          </Flex>
-                        )
-                      })
-                    }
-
-
-
-
-
+                  <Flex gap={1}>
+                    {!events ? (
+                      <Text color={"gray.500"} fontSize="sm">
+                        Nenhum evento
+                      </Text>
+                    ) : (
+                      <Text color={"gray.500"} fontSize="sm">
+                        Evento aqui
+                      </Text>
+                    )}
                   </Flex>
                 </Flex>
               </Flex>
