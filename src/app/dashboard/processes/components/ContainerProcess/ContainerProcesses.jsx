@@ -66,6 +66,7 @@ export default function ContainerProcesses({ processes = [] }) {
                 _dark={{ bg: "gray.900" }}
               >
                 <Flex flexDir="column" w={"full"} gap={2}>
+
                   {emAndamento.length === 0 ? (
                     <Text color={"gray.500"} fontSize="sm">
                       Nenhum processo
@@ -80,6 +81,7 @@ export default function ContainerProcesses({ processes = [] }) {
                         processType={process.typeProcess}
                         tribunal={process.tribunal}
                         partes={process.partes}
+                        tags={process.tags}
                       />
                     ))
                   )}
@@ -150,12 +152,12 @@ export default function ContainerProcesses({ processes = [] }) {
                       <ProcessCard
                         key={process.id}
                         status={process.status}
-
                         processId={process.id}
                         processNumber={process.processNumber}
                         processType={process.typeProcess}
                         tribunal={process.tribunal}
                         partes={process.partes}
+                        tags={process.tags}
                       />
                     ))
                   )}
@@ -226,12 +228,12 @@ export default function ContainerProcesses({ processes = [] }) {
                       <ProcessCard
                         key={process.id}
                         status={process.status}
-
                         processId={process.id}
                         processNumber={process.processNumber}
                         processType={process.typeProcess}
                         tribunal={process.tribunal}
                         partes={process.partes}
+                        tags={process.tags}
                       />
                     ))
                   )}

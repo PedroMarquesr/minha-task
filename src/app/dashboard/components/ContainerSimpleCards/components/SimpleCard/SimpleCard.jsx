@@ -33,7 +33,6 @@ export default function SimpleCard({
         transition: "all 0.3s ease",
         cursor: "pointer",
       }}
-
     >
       <Flex flexDir="row" justifyContent={"space-between"} w={"full"} gap={3}>
         <Flex
@@ -47,16 +46,17 @@ export default function SimpleCard({
         >
           <Text
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
-
             textAlign={"center"}
             borderRadius={{ base: "none", lg: "lg" }}
             pt={{ base: 3, lg: 0 }}
-            _dark={{ color: "gray.900" }}
+            _dark={{ color: "gray.100" }}
           >
             {title}
           </Text>
 
-          <Text fontSize={30} textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
+          <Text
+            fontSize={30}
+            textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
             _dark={{ textShadow: "0px 0px 2px rgba(255, 255, 255, 1)" }}
           >
             {quantity}
