@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa"
 import { RiMoneyDollarCircleFill } from "react-icons/ri"
 import { MdNextPlan } from "react-icons/md"
-
+import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
 import { Tooltip } from "@/components/ui/tooltip"
 
 export default function ProcessCard({
@@ -28,6 +28,8 @@ export default function ProcessCard({
   tags = [],
   events = [],
 }) {
+  const [isDialogAddValueOpen, setIsDialogAddValueOpen] = useState(false)
+
   const handleColorStatus = (status) => {
     switch (status) {
       case "em_andamento":
@@ -61,6 +63,9 @@ export default function ProcessCard({
           },
         }
     }
+  }
+  const handleOpenDialog = () => {
+    setIsDialogAddValueOpen(!isDialogAddValueOpen)
   }
 
   return (
@@ -102,6 +107,7 @@ export default function ProcessCard({
               _hover={{ bg: "transparent", opacity: 0.8 }}
               color="orange.500"
               _dark={{ color: "yellow.500" }}
+              onClick={handleOpenDialog}
             >
               <RiMoneyDollarCircleFill size={22} />
             </IconButton>
@@ -220,6 +226,11 @@ export default function ProcessCard({
           </Accordion.Item>
         </Accordion.Root>
       </Flex>
+      <DialogAddValueprocess
+        isOpen={isDialogAddValueOpen}
+        onClose={() => setIsDialogAddValueOpen(false)}
+        setIsOpen={handleOpenDialog}
+      />
     </Flex>
   )
 }
