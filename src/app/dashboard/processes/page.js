@@ -107,7 +107,6 @@ export default function PageProcess() {
     }
   }
 
-  //Aqui
 
   useEffect(() => {
     if (!user?.companyId) return
