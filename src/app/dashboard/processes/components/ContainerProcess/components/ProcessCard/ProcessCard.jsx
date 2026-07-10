@@ -1,6 +1,22 @@
-import { Flex, Text, Accordion, Badge } from "@chakra-ui/react"
+import {
+  Flex,
+  Text,
+  Accordion,
+  Badge,
+  IconButton,
+  Button,
+} from "@chakra-ui/react"
 import { useState } from "react"
-import { FaAngleDown, FaAngleUp, FaRegUser } from "react-icons/fa"
+import {
+  FaAngleDown,
+  FaAngleUp,
+  FaRegUser,
+  FaCalendarPlus,
+} from "react-icons/fa"
+import { RiMoneyDollarCircleFill } from "react-icons/ri"
+import { MdNextPlan } from "react-icons/md"
+
+import { Tooltip } from "@/components/ui/tooltip"
 
 export default function ProcessCard({
   processNumber,
@@ -57,9 +73,55 @@ export default function ProcessCard({
       gap={1}
       {...handleColorStatus(status)}
     >
-      <Text key={processId} color={"gray.700"} _dark={{ color: "gray.200" }}>
-        {processNumber}
-      </Text>
+      <Flex w={"full"} justify={"space-between"}>
+        <Text key={processId} color={"gray.700"} _dark={{ color: "gray.200" }}>
+          {processNumber}
+        </Text>
+        <Flex>
+          <Tooltip content="Adicionar evento" placement="top">
+            <IconButton
+              variant="ghost"
+              cursor="pointer"
+              p={0}
+              minW="auto"
+              h="auto"
+              _hover={{ bg: "transparent", opacity: 0.8 }}
+              color="purple.500"
+              _dark={{ color: "purple.300" }}
+            >
+              <FaCalendarPlus size={12} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip content="Editar valor do processo" placement="top">
+            <IconButton
+              variant="ghost"
+              cursor="pointer"
+              p={0}
+              minW="auto"
+              h="auto"
+              _hover={{ bg: "transparent", opacity: 0.8 }}
+              color="orange.500"
+              _dark={{ color: "yellow.500" }}
+            >
+              <RiMoneyDollarCircleFill size={22} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip content="Atualizar status do processo" placement="top">
+            <IconButton
+              variant="ghost"
+              cursor="pointer"
+              p={0}
+              minW="auto"
+              h="auto"
+              _hover={{ bg: "transparent", opacity: 0.8 }}
+              color="green.500"
+              _dark={{ color: "green.300" }}
+            >
+              <MdNextPlan size={20} />
+            </IconButton>
+          </Tooltip>
+        </Flex>
+      </Flex>
       <Flex align={"center"} gap={2}>
         <Flex
           gap={2}
