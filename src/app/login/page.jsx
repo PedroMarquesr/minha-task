@@ -88,46 +88,6 @@ export default function Login() {
     }
   }
 
-  // const findUserCompany = async (uid) => {
-  //   const q = query(
-  //     collection(db, "companies"),
-  //     where("members", "array-contains", uid),
-  //   )
-
-  //   const snapshot = await getDocs(q)
-  //   if (!snapshot.empty) {
-  //     const doc = snapshot.docs[0]
-  //     return { id: doc.id, ...doc.data() }
-  //   }
-  //   return null
-  // }
-
-  // const handleLogin = async () => {
-  //   try {
-  //     setLoading(true)
-  //     const result = await signInWithEmailAndPassword(auth, email, password)
-  //     const loggedUser = result.user
-
-  //     const company = await findUserCompany(loggedUser.uid)
-
-  //     setUser({
-  //       uid: loggedUser.uid,
-  //       email: loggedUser.email,
-  //       displayName: loggedUser.displayName,
-  //       photoURL: loggedUser.photoURL,
-  //       companyId: company?.id || null,
-  //       role: company?.roles?.[loggedUser.uid] || "member",
-  //     })
-
-  //     router.push("/dashboard")
-  //   } catch (error) {
-  //     console.log(error)
-  //     setError(traduzirErro(error.code))
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
-
   return (
     <Box minH="100vh">
       <NavBar />

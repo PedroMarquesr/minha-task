@@ -16,6 +16,7 @@ import {
 import { RiMoneyDollarCircleFill } from "react-icons/ri"
 import { MdNextPlan } from "react-icons/md"
 import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
+import { formatCurrency } from "@/utils/format"
 import { Tooltip } from "@/components/ui/tooltip"
 
 export default function ProcessCard({
@@ -27,8 +28,10 @@ export default function ProcessCard({
   partes = [],
   tags = [],
   events = [],
+  valorCausa,
 }) {
   const [isDialogAddValueOpen, setIsDialogAddValueOpen] = useState(false)
+  const [isOpenAlert, setIsOpenAlert] = useState(false)
 
   const handleColorStatus = (status) => {
     switch (status) {
@@ -170,6 +173,20 @@ export default function ProcessCard({
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
               <Flex p={3} flexDir={"column"} gap={2}>
+
+                <Flex flexDir={"column"}>
+                  <Text>Valor do processo</Text>
+                  {!valorCausa ? (
+                    <Text color={"gray.500"} fontSize="sm">
+                      Não registrado
+                    </Text>
+                  ) : (
+                    <Text color={"gray.500"} fontSize="sm">
+                      {formatCurrency(valorCausa)}
+                    </Text>
+                  )}
+                </Flex>
+
                 <Flex flexDir={"column"}>
                   <Text>Partes</Text>
 
@@ -230,6 +247,7 @@ export default function ProcessCard({
         isOpen={isDialogAddValueOpen}
         onClose={() => setIsDialogAddValueOpen(false)}
         setIsOpen={handleOpenDialog}
+        processId={processId}
       />
     </Flex>
   )
