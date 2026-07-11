@@ -8,6 +8,8 @@ export default function AlertDefault({ description, status }) {
         <Alert.Root
             status={status}
             w="100%"
+            left={0}
+            right={0}
             zIndex={100}
             position="fixed"
             variant="solid"
@@ -19,7 +21,7 @@ export default function AlertDefault({ description, status }) {
 
         >
             <Alert.Indicator />
-            <Alert.Content>
+            <Alert.Content w={"100vw"}>
                 <Flex flexDir={"row"} alignItems={"center"} >
                     <Alert.Description>{description}</Alert.Description>
                 </Flex>

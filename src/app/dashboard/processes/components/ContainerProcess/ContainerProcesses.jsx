@@ -82,6 +82,7 @@ export default function ContainerProcesses({ processes = [] }) {
                         tribunal={process.tribunal}
                         partes={process.partes}
                         tags={process.tags}
+                        valorCausa={process?.valorCausa}
                       />
                     ))
                   )}
