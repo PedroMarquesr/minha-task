@@ -18,6 +18,7 @@ import { MdNextPlan } from "react-icons/md"
 import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
 import { formatCurrency } from "@/utils/format"
 import { Tooltip } from "@/components/ui/tooltip"
+import DialogNewEvent from "./components/DialogNewEvent/DialogNewEvent"
 
 export default function ProcessCard({
   processNumber,
@@ -249,6 +250,8 @@ export default function ProcessCard({
         setIsOpen={handleOpenDialog}
         processId={processId}
       />
+
+      <DialogNewEvent />
     </Flex>
   )
 }
