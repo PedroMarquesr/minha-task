@@ -7,6 +7,8 @@ import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useStore } from "@/hooks/useStore"
 import { v4 as uuidv4 } from 'uuid';
+import AlertCustom from "@/app/dashboard/components/AlertCustom/AlertCustom";
+
 
 
 
@@ -25,6 +27,7 @@ const initialEventState = {
 
 export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
     const [event, setEvent] = useState(initialEventState)
+    const [openAlert, setOpenAlert] = useState(false)
     const { user } = useStore()
 
     const handleClose = () => {
@@ -51,6 +54,10 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
         await setDoc(doc(db, "events", eventId), eventData)
 
         handleClose()
+        setOpenAlert(true)
+        setTimeout(() => {
+            setOpenAlert(false)
+        }, 2000)
     }
 
 
@@ -551,6 +558,7 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Portal>
+            <AlertCustom open={openAlert} title="Teste" description="Evento criado com sucesso" status="success" />
         </Dialog.Root>
     )
 }

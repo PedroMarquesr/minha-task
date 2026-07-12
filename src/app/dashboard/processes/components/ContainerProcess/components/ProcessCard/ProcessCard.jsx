@@ -5,8 +5,9 @@ import {
   Badge,
   IconButton,
   Button,
+
 } from "@chakra-ui/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   FaAngleDown,
   FaAngleUp,
@@ -15,10 +16,14 @@ import {
 } from "react-icons/fa"
 import { RiMoneyDollarCircleFill } from "react-icons/ri"
 import { MdNextPlan } from "react-icons/md"
-import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
 import { formatCurrency } from "@/utils/format"
 import { Tooltip } from "@/components/ui/tooltip"
+import { collection, query, where, getDocs, QuerySnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import DialogNewEvent from "./components/DialogNewEvent/DialogNewEvent"
+import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
+
+import EventCard from "./components/EventCard/EventCard"
 
 export default function ProcessCard({
   processNumber,
@@ -30,42 +35,53 @@ export default function ProcessCard({
   tags = [],
   events = [],
   valorCausa,
+  companyId
 }) {
   const [isDialogAddValueOpen, setIsDialogAddValueOpen] = useState(false)
   const [isOpenAlert, setIsOpenAlert] = useState(false)
   const [isDialogNewEventOpen, setIsDialogNewEventOpen] = useState(false)
+  const [processEvents, setProcessEvents] = useState([])
+
 
   const handleColorStatus = (status) => {
     switch (status) {
       case "em_andamento":
         return {
-          borderColor: "purple.200",
-          _dark: { borderColor: "purple.700" },
+          borderColor: "purple.300",
+          bg: "purple.50",
+          _dark: { borderColor: "purple.600", bg: "purple.950" },
           _hover: {
-            borderColor: "purple.500",
-            bg: "purple.50",
-            _dark: { bg: "purple.900/40" },
+            borderColor: "purple.400",
+            bg: "purple.100",
+            _dark: { bg: "purple.900" },
           },
         }
       case "encerrado":
         return {
-          borderColor: "green.200",
-          _dark: { borderColor: "green.700" },
+          borderColor: "green.300",
+          bg: "green.50",
+          _dark: { borderColor: "green.600", bg: "green.950" },
           _hover: {
-            borderColor: "green.500",
-            bg: "green.50",
-            _dark: { bg: "green.900/40" },
+            borderColor: "green.400",
+            bg: "green.100",
+            _dark: { bg: "green.900" },
           },
         }
       case "arquivado":
         return {
-          borderColor: "blue.200",
-          _dark: { borderColor: "blue.700" },
+          borderColor: "blue.300",
+          bg: "blue.50",
+          _dark: { borderColor: "blue.600", bg: "blue.950" },
           _hover: {
-            borderColor: "blue.500",
-            bg: "blue.50",
-            _dark: { bg: "blue.900/40" },
+            borderColor: "blue.400",
+            bg: "blue.100",
+            _dark: { bg: "blue.900" },
           },
+        }
+      default:
+        return {
+          borderColor: "gray.200",
+          _dark: { borderColor: "gray.700" },
         }
     }
   }
@@ -73,18 +89,42 @@ export default function ProcessCard({
     setIsDialogAddValueOpen(!isDialogAddValueOpen)
   }
 
+
+  const fetchEvents = async () => {
+    const q = query(collection(db, 'events'),
+      where('companyId', '==', companyId),
+      where('processId', '==', processId),
+    )
+    const querySnapshot = await getDocs(q)
+    const data = querySnapshot.docs.map((doc) => doc.data())
+    setProcessEvents(data)
+  }
+
+  useEffect(() => {
+    console.log(events)
+    fetchEvents()
+  }, [processId])
+
   return (
     <Flex
       key={processId}
       flexDir={"column"}
       border="1px solid"
-      borderRadius={"md"}
-      p={2}
-      gap={1}
+      borderRadius={"lg"}
+      p={3}
+      gap={2}
+      transition="all 0.15s ease"
       {...handleColorStatus(status)}
     >
-      <Flex w={"full"} justify={"space-between"}>
-        <Text key={processId} color={"gray.700"} _dark={{ color: "gray.200" }}>
+      <Flex w={"full"} justify={"space-between"} align="center">
+        <Text
+          key={processId}
+          fontWeight="semibold"
+          fontSize="sm"
+          color={"gray.800"}
+          _dark={{ color: "gray.100" }}
+          letterSpacing="tight"
+        >
           {processNumber}
         </Text>
         <Flex>
@@ -134,36 +174,38 @@ export default function ProcessCard({
           </Tooltip>
         </Flex>
       </Flex>
-      <Flex align={"center"} gap={2}>
+      <Flex align={"center"} gap={2} flexWrap="wrap">
         <Flex
-          gap={2}
+          gap={1}
           fontSize={"xs"}
-          color={"gray.600"}
-          _dark={{ color: "gray.300" }}
+          color={"gray.500"}
+          _dark={{ color: "gray.400" }}
+          align="center"
         >
-          <Text>{processType} </Text>
-          <Text>-</Text>
-
+          <Text>{processType}</Text>
+          <Text opacity={0.5}>·</Text>
           <Text>{tribunal}</Text>
         </Flex>
-        <Flex justify={"center"} gap={1}>
+        <Flex justify={"center"} gap={1} flexWrap="wrap">
           {tags.length > 0 &&
             tags.map((tag, index) => {
               return (
-                <Flex key={index} gap={2}>
-                  <Badge
-                    colorPalette={
-                      status === "encerrado"
-                        ? "green"
-                        : status === "arquivado"
-                          ? "blue"
-                          : "purple"
-                    }
-                    variant={"surface"}
-                  >
-                    {tag}
-                  </Badge>
-                </Flex>
+                <Badge
+                  key={index}
+                  colorPalette={
+                    status === "encerrado"
+                      ? "green"
+                      : status === "arquivado"
+                        ? "blue"
+                        : "purple"
+                  }
+                  variant={"subtle"}
+                  fontSize="2xs"
+                  px={2}
+                  borderRadius="full"
+                >
+                  {tag}
+                </Badge>
               )
             })}
         </Flex>
@@ -177,48 +219,73 @@ export default function ProcessCard({
             <Accordion.ItemContent>
               <Flex p={3} flexDir={"column"} gap={2}>
 
-                <Flex flexDir={"column"}>
-                  <Text>Valor do processo</Text>
+                <Flex flexDir={"column"} gap={1}>
+                  <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    textTransform="uppercase"
+                    letterSpacing="wide"
+                    color={"gray.400"}
+                    _dark={{ color: "gray.500" }}
+                  >
+                    Valor do processo
+                  </Text>
                   {!valorCausa ? (
-                    <Text color={"gray.500"} fontSize="sm">
+                    <Text color={"gray.400"} fontSize="sm" fontStyle="italic">
                       Não registrado
                     </Text>
                   ) : (
-                    <Text color={"gray.500"} fontSize="sm">
+                    <Text fontWeight="semibold" fontSize="sm" color={"gray.700"} _dark={{ color: "gray.200" }}>
                       {formatCurrency(valorCausa)}
                     </Text>
                   )}
                 </Flex>
 
-                <Flex flexDir={"column"}>
-                  <Text>Partes</Text>
-
-                  <Flex gap={1}>
+                <Flex flexDir={"column"} gap={2}>
+                  <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    textTransform="uppercase"
+                    letterSpacing="wide"
+                    color={"gray.400"}
+                    _dark={{ color: "gray.500" }}
+                  >
+                    Partes
+                  </Text>
+                  <Flex gap={2} flexWrap="wrap">
                     {partes.map((parte, index) => {
                       return (
                         <Flex
                           key={index}
                           gap={2}
-                          p={2}
+                          px={3}
+                          py={1}
                           align={"center"}
-                          border={"1px solid"}
-                          borderRadius={"md"}
-                          borderColor={handleColorStatus(status).borderColor}
+                          borderRadius={"full"}
+                          bg={"purple.100"}
+                          _dark={{ bg: "purple.900" }}
                         >
                           <Text
-                            color={"gray.500"}
-                            _dark={{ color: "gray.200" }}
+                            color={"purple.500"}
+                            _dark={{ color: "purple.300" }}
+                            fontSize="xs"
                           >
                             <FaRegUser />
                           </Text>
                           <Text
                             fontSize={"xs"}
+                            fontWeight="medium"
                             color={"gray.700"}
                             _dark={{ color: "gray.200" }}
                           >
                             {parte.nome}
                           </Text>
-                          <Badge colorPalette={"purple"} variant="outline">
+                          <Badge
+                            colorPalette={"purple"}
+                            variant="subtle"
+                            fontSize="2xs"
+                            borderRadius="full"
+                          >
                             {parte.polo}
                           </Badge>
                         </Flex>
@@ -226,18 +293,46 @@ export default function ProcessCard({
                     })}
                   </Flex>
                 </Flex>
-                <Flex flexDir={"column"}>
-                  <Text>Eventos</Text>
+                <Flex flexDir={"column"} gap={2} w="100%">
+                  <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    textTransform="uppercase"
+                    letterSpacing="wide"
+                    color={"gray.400"}
+                    _dark={{ color: "gray.500" }}
+                  >
+                    Eventos
+                  </Text>
 
-                  <Flex gap={1}>
-                    {!events ? (
+                  <Flex gap={1} w="100%">
+                    {processEvents.length === 0 ? (
                       <Text color={"gray.500"} fontSize="sm">
-                        Nenhum evento
+                        Nenhum evento cadastrado
                       </Text>
                     ) : (
-                      <Text color={"gray.500"} fontSize="sm">
-                        Evento aqui
-                      </Text>
+                      <Flex flexDir="column" gap={2} w="100%">
+                        <Accordion.Root collapsible w="100%">
+                          <Accordion.Item value="eventos">
+                            <Accordion.ItemTrigger>
+                              <Flex flexDir={"row"} gap={2} alignItems={"center"} w="100%">
+                                <Flex color={"gray.500"} fontSize="sm" gap={2}>
+                                  <Text>Eventos cadastrados</Text>
+                                  <Badge colorPalette={"purple"} variant={"surface"}>{processEvents.length}</Badge>
+                                </Flex>
+                                <Accordion.ItemIndicator />
+                              </Flex>
+                            </Accordion.ItemTrigger>
+                            <Accordion.ItemContent>
+                              <Flex flexDir="column" gap={2}>
+                                {processEvents.map((event, index) => (
+                                  <EventCard key={event.id ?? index} event={event} />
+                                ))}
+                              </Flex>
+                            </Accordion.ItemContent>
+                          </Accordion.Item>
+                        </Accordion.Root>
+                      </Flex>
                     )}
                   </Flex>
                 </Flex>
