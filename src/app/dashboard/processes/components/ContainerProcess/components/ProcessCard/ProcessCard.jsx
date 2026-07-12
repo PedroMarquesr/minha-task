@@ -33,6 +33,7 @@ export default function ProcessCard({
 }) {
   const [isDialogAddValueOpen, setIsDialogAddValueOpen] = useState(false)
   const [isOpenAlert, setIsOpenAlert] = useState(false)
+  const [isDialogNewEventOpen, setIsDialogNewEventOpen] = useState(false)
 
   const handleColorStatus = (status) => {
     switch (status) {
@@ -97,6 +98,7 @@ export default function ProcessCard({
               _hover={{ bg: "transparent", opacity: 0.8 }}
               color="purple.500"
               _dark={{ color: "purple.300" }}
+              onClick={() => setIsDialogNewEventOpen(true)}
             >
               <FaCalendarPlus size={12} />
             </IconButton>
@@ -251,7 +253,11 @@ export default function ProcessCard({
         processId={processId}
       />
 
-      <DialogNewEvent />
+      <DialogNewEvent
+        isOpen={isDialogNewEventOpen}
+        setIsOpen={setIsDialogNewEventOpen}
+        processId={processId}
+      />
     </Flex>
   )
 }
