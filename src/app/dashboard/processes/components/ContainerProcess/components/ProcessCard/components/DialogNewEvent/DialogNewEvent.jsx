@@ -2,48 +2,62 @@ import { Dialog, Flex, Input, Portal, Button, Text, IconButton } from "@chakra-u
 import ComboboxProcess from "@/app/dashboard/processes/components/ComboboxProcess/ComboboxProcess"
 import { useState } from "react"
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { Tooltip } from "@/components/ui/tooltip"
+import { Tooltip } from "@/components/ui/tooltip";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useStore } from "@/hooks/useStore"
+import { v4 as uuidv4 } from 'uuid';
+import AlertCustom from "@/app/dashboard/components/AlertCustom/AlertCustom";
 
 
 
+
+
+
+const initialEventState = {
+    tipo: null,
+    data: "",
+    status: null,
+    local: "",
+    tipoAudiencia: "",
+    testemunhas: [],
+    camposCustomizaveis: [],
+    custos: [],
+}
 
 export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
-    const [typeEvent, setTypeEvent] = useState(null)
-    const [date, setDate] = useState("")
-    const [status, setStatus] = useState(null)
-    const [local, setLocal] = useState("")
-    const [typeAudience, setTypeAudience] = useState("")
-    const [witnesses, setWitnesses] = useState([])
-    const [customFields, setCustomFields] = useState([])
-    const [costs, setCosts] = useState([])
+    const [event, setEvent] = useState(initialEventState)
+    const [openAlert, setOpenAlert] = useState(false)
+    const { user } = useStore()
 
     const handleClose = () => {
-        setTypeEvent(null)
-        setDate("")
-        setStatus(null)
-        setLocal("")
-        setTypeAudience("")
-        setWitnesses([])
-        setCustomFields([])
-        setCosts([])
+        setEvent(initialEventState)
         setIsOpen(false)
     }
 
-    const handleSalvar = () => {
+    const handleSalvar = async () => {
+
+        if (!user?.companyId) return
+
+        const eventId = uuidv4()
         const eventData = {
+            ...event,
             processId,
-            tipo: typeEvent,
-            data: date,
-            status,
-            local,
-            tipoAudiencia: typeAudience,
-            testemunhas: witnesses,
-            camposCustomizaveis: customFields,
-            custos: costs,
+            id: eventId,
+            companyId: user.companyId,
+            creatorId: user.uid,
+            userCreator: user.nome ?? user.name ?? "",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
         }
-        // TODO: integrar com backend
         console.log("Evento a salvar:", eventData)
+        await setDoc(doc(db, "events", eventId), eventData)
+
         handleClose()
+        setOpenAlert(true)
+        setTimeout(() => {
+            setOpenAlert(false)
+        }, 2000)
     }
 
 
@@ -89,8 +103,8 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                 <ComboboxProcess
                                     label={"Tipo"}
                                     listOptions={optionsTypeEvent}
-                                    value={typeEvent}
-                                    onValueChange={(e) => setTypeEvent(e.value[0] ?? null)}
+                                    value={event.tipo}
+                                    onValueChange={(e) => setEvent(prev => ({ ...prev, tipo: e.value[0] ?? null }))}
                                 />
 
                                 <Flex justify={"space-between"}>
@@ -99,8 +113,8 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                         <Input
                                             w={"200px"} mt={2} type="date"
                                             placeholder="Data do evento"
-                                            value={date}
-                                            onChange={(e) => setDate(e.target.value)}
+                                            value={event.data}
+                                            onChange={(e) => setEvent(prev => ({ ...prev, data: e.target.value }))}
                                         />
                                     </Flex>
 
@@ -108,8 +122,8 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                         <Text>Status</Text>
                                         <ComboboxProcess
                                             listOptions={optionsStatusProcess}
-                                            value={status}
-                                            onValueChange={(e) => setStatus(e.value[0] ?? null)}
+                                            value={event.status}
+                                            onValueChange={(e) => setEvent(prev => ({ ...prev, status: e.value[0] ?? null }))}
                                         />
                                     </Flex>
                                 </Flex>
@@ -118,16 +132,16 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                     <Text>Local</Text>
                                     <Input
                                         mt={2} type="text" placeholder="Local do evento"
-                                        value={local}
-                                        onChange={(e) => setLocal(e.target.value)}
+                                        value={event.local}
+                                        onChange={(e) => setEvent(prev => ({ ...prev, local: e.target.value }))}
                                     />
                                 </Flex>
                                 <Flex flexDir={"column"}>
                                     <Text>Tipo de audiência</Text>
                                     <Input
                                         mt={2} type="text" placeholder="Tipo de audiência"
-                                        value={typeAudience}
-                                        onChange={(e) => setTypeAudience(e.target.value)}
+                                        value={event.tipoAudiencia}
+                                        onChange={(e) => setEvent(prev => ({ ...prev, tipoAudiencia: e.target.value }))}
                                     />
                                 </Flex>
                                 <Flex alignItems={"center"} justifyContent={"space-between"}>
@@ -137,13 +151,16 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                         colorPalette="purple"
                                         size={"sm"}
                                         onClick={() =>
-                                            setWitnesses(prev => [...prev, { id: Date.now(), nome: "", contato: "" }])
+                                            setEvent(prev => ({
+                                                ...prev,
+                                                testemunhas: [...prev.testemunhas, { id: Date.now(), nome: "", contato: "" }]
+                                            }))
                                         }
                                     >
                                         <FaPlus /> Adicionar
                                     </Button>
                                 </Flex>
-                                {witnesses.map((witness) => (
+                                {event.testemunhas.map((witness) => (
                                     <Flex key={witness.id} alignItems={"center"}
 
                                         borderRadius={"md"}
@@ -158,11 +175,12 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     placeholder="Nome da testemunha"
                                                     value={witness.nome}
                                                     onChange={(e) =>
-                                                        setWitnesses(prev =>
-                                                            prev.map(w =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            testemunhas: prev.testemunhas.map(w =>
                                                                 w.id === witness.id ? { ...w, nome: e.target.value } : w
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
@@ -172,11 +190,12 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     placeholder="Telefone ou e-mail"
                                                     value={witness.contato}
                                                     onChange={(e) =>
-                                                        setWitnesses(prev =>
-                                                            prev.map(w =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            testemunhas: prev.testemunhas.map(w =>
                                                                 w.id === witness.id ? { ...w, contato: e.target.value } : w
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
@@ -189,7 +208,10 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                 colorPalette="red"
                                                 size={"sm"}
                                                 onClick={() =>
-                                                    setWitnesses(prev => prev.filter(w => w.id !== witness.id))
+                                                    setEvent(prev => ({
+                                                        ...prev,
+                                                        testemunhas: prev.testemunhas.filter(w => w.id !== witness.id)
+                                                    }))
                                                 }
                                             >
                                                 <FaTrash />
@@ -207,54 +229,58 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                         colorPalette="purple"
                                         size={"sm"}
                                         onClick={() =>
-                                            setCustomFields(prev => [...prev, { id: Date.now(), label: "", tipo: "", valor: "" }])
+                                            setEvent(prev => ({
+                                                ...prev,
+                                                camposCustomizaveis: [...prev.camposCustomizaveis, { id: Date.now(), label: "", tipo: "", valor: "" }]
+                                            }))
                                         }
                                     >
                                         <FaPlus /> Adicionar
                                     </Button>
                                 </Flex>
 
-                                {customFields.map((field) => (
+                                {event.camposCustomizaveis.map((field) => (
                                     <Flex key={field.id} flexDir={"column"} gap={2}
                                         borderRadius={"md"} p={3}
                                         border={"1px solid"}
                                         borderColor={"gray.200"} _dark={{ borderColor: "gray.700" }}
                                     >
                                         <Flex gap={2} alignItems={"flex-end"}>
-                                            {/* Label */}
                                             <Flex flexDir={"column"} flex={1} gap={1}>
-                                                <Text fontSize={"xs"} color={"gray.500"}>Label</Text>
                                                 <Input
                                                     size={"sm"}
                                                     placeholder="Nome do campo"
                                                     value={field.label}
                                                     onChange={(e) =>
-                                                        setCustomFields(prev =>
-                                                            prev.map(f =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            camposCustomizaveis: prev.camposCustomizaveis.map(f =>
                                                                 f.id === field.id ? { ...f, label: e.target.value } : f
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
+                                            <Tooltip content="Tipo de campo" placement="bottom">
 
-                                            {/* Tipo via ComboboxProcess */}
-                                            <Flex flex={1}>
-                                                <ComboboxProcess
-                                                    label={"Tipo"}
-                                                    listOptions={optionsCustomFieldType}
-                                                    value={field.tipo}
-                                                    onValueChange={(e) =>
-                                                        setCustomFields(prev =>
-                                                            prev.map(f =>
-                                                                f.id === field.id ? { ...f, tipo: e.value[0] ?? "", valor: "" } : f
-                                                            )
-                                                        )
-                                                    }
-                                                />
-                                            </Flex>
+                                                <Flex flex={1}>
+                                                    <ComboboxProcess
+                                                        listOptions={optionsCustomFieldType}
+                                                        value={field.tipo}
+                                                        placeholder="Tipo"
+                                                        onValueChange={(e) =>
+                                                            setEvent(prev => ({
+                                                                ...prev,
+                                                                camposCustomizaveis: prev.camposCustomizaveis.map(f =>
+                                                                    f.id === field.id ? { ...f, tipo: e.value[0] ?? "", valor: "" } : f
+                                                                )
+                                                            }))
+                                                        }
+                                                    />
+                                                </Flex>
+                                            </Tooltip>
 
-                                            {/* Botão excluir */}
+
                                             <Tooltip content="Remover campo" placement="bottom">
                                                 <IconButton
                                                     aria-label="Remover campo"
@@ -263,7 +289,10 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     size={"sm"}
                                                     mb={"2px"}
                                                     onClick={() =>
-                                                        setCustomFields(prev => prev.filter(f => f.id !== field.id))
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            camposCustomizaveis: prev.camposCustomizaveis.filter(f => f.id !== field.id)
+                                                        }))
                                                     }
                                                 >
                                                     <FaTrash />
@@ -271,25 +300,24 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                             </Tooltip>
                                         </Flex>
 
-                                        {/* Valor — renderiza conforme o tipo */}
                                         {field.tipo && (
                                             <Flex flexDir={"column"} gap={1}>
                                                 <Text fontSize={"xs"} color={"gray.500"}>
                                                     {field.tipo === "lista" ? "Itens da lista" : "Valor"}
                                                 </Text>
 
-                                                {/* CHECK */}
                                                 {field.tipo === "check" && (
                                                     <Flex alignItems={"center"} gap={2} mt={1}>
                                                         <input
                                                             type="checkbox"
                                                             checked={field.valor === true}
                                                             onChange={(e) =>
-                                                                setCustomFields(prev =>
-                                                                    prev.map(f =>
+                                                                setEvent(prev => ({
+                                                                    ...prev,
+                                                                    camposCustomizaveis: prev.camposCustomizaveis.map(f =>
                                                                         f.id === field.id ? { ...f, valor: e.target.checked } : f
                                                                     )
-                                                                )
+                                                                }))
                                                             }
                                                             style={{ width: 16, height: 16, accentColor: "purple", cursor: "pointer" }}
                                                         />
@@ -297,10 +325,8 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     </Flex>
                                                 )}
 
-                                                {/* LISTA */}
                                                 {field.tipo === "lista" && (
                                                     <Flex flexDir={"column"} gap={2}>
-                                                        {/* Itens existentes */}
                                                         {(Array.isArray(field.valor) ? field.valor : []).map((item) => (
                                                             <Flex key={item.id} alignItems={"center"} gap={2}>
                                                                 <Input
@@ -309,8 +335,9 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                                     value={item.texto}
                                                                     placeholder="Item da lista"
                                                                     onChange={(e) =>
-                                                                        setCustomFields(prev =>
-                                                                            prev.map(f =>
+                                                                        setEvent(prev => ({
+                                                                            ...prev,
+                                                                            camposCustomizaveis: prev.camposCustomizaveis.map(f =>
                                                                                 f.id === field.id
                                                                                     ? {
                                                                                         ...f,
@@ -320,7 +347,7 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                                                     }
                                                                                     : f
                                                                             )
-                                                                        )
+                                                                        }))
                                                                     }
                                                                 />
                                                                 <Tooltip content="Remover item" placement="bottom">
@@ -330,13 +357,14 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                                         colorPalette="red"
                                                                         size={"xs"}
                                                                         onClick={() =>
-                                                                            setCustomFields(prev =>
-                                                                                prev.map(f =>
+                                                                            setEvent(prev => ({
+                                                                                ...prev,
+                                                                                camposCustomizaveis: prev.camposCustomizaveis.map(f =>
                                                                                     f.id === field.id
                                                                                         ? { ...f, valor: f.valor.filter(v => v.id !== item.id) }
                                                                                         : f
                                                                                 )
-                                                                            )
+                                                                            }))
                                                                         }
                                                                     >
                                                                         <FaTrash />
@@ -345,15 +373,15 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                             </Flex>
                                                         ))}
 
-                                                        {/* Botão adicionar item */}
                                                         <Button
                                                             variant="outline"
                                                             colorPalette="purple"
                                                             size={"xs"}
                                                             alignSelf={"flex-start"}
                                                             onClick={() =>
-                                                                setCustomFields(prev =>
-                                                                    prev.map(f =>
+                                                                setEvent(prev => ({
+                                                                    ...prev,
+                                                                    camposCustomizaveis: prev.camposCustomizaveis.map(f =>
                                                                         f.id === field.id
                                                                             ? {
                                                                                 ...f,
@@ -364,7 +392,7 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                                             }
                                                                             : f
                                                                     )
-                                                                )
+                                                                }))
                                                             }
                                                         >
                                                             <FaPlus /> Adicionar item
@@ -372,27 +400,27 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     </Flex>
                                                 )}
 
-                                                {/* TEXT / DATA / NUMERO */}
                                                 {field.tipo !== "check" && field.tipo !== "lista" && (
                                                     <Input
                                                         size={"sm"}
                                                         type={
                                                             field.tipo === "data" ? "date" :
-                                                            field.tipo === "numero" ? "number" :
-                                                            "text"
+                                                                field.tipo === "numero" ? "number" :
+                                                                    "text"
                                                         }
                                                         placeholder={
                                                             field.tipo === "numero" ? "0" :
-                                                            field.tipo === "data" ? "" :
-                                                            "Digite o valor"
+                                                                field.tipo === "data" ? "" :
+                                                                    "Digite o valor"
                                                         }
                                                         value={field.valor}
                                                         onChange={(e) =>
-                                                            setCustomFields(prev =>
-                                                                prev.map(f =>
+                                                            setEvent(prev => ({
+                                                                ...prev,
+                                                                camposCustomizaveis: prev.camposCustomizaveis.map(f =>
                                                                     f.id === field.id ? { ...f, valor: e.target.value } : f
                                                                 )
-                                                            )
+                                                            }))
                                                         }
                                                     />
                                                 )}
@@ -408,23 +436,22 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                         colorPalette="purple"
                                         size={"sm"}
                                         onClick={() =>
-                                            setCosts(prev => [
+                                            setEvent(prev => ({
                                                 ...prev,
-                                                { id: Date.now(), descricao: "", valor: "", data: "", tipo: "" }
-                                            ])
+                                                custos: [...prev.custos, { id: Date.now(), descricao: "", valor: "", data: "", tipo: "" }]
+                                            }))
                                         }
                                     >
                                         <FaPlus /> Adicionar
                                     </Button>
                                 </Flex>
 
-                                {costs.map((cost) => (
+                                {event.custos.map((cost) => (
                                     <Flex key={cost.id} flexDir={"column"} gap={3}
                                         borderRadius={"md"} p={3}
                                         border={"1px solid"}
                                         borderColor={"gray.200"} _dark={{ borderColor: "gray.700" }}
                                     >
-                                        {/* Linha 1: Descrição + botão excluir */}
                                         <Flex gap={2} alignItems={"flex-end"} justifyContent={"space-between"}>
                                             <Flex flexDir={"column"} gap={1} flex={1}>
                                                 <Text fontSize={"xs"} color={"gray.500"}>Descrição</Text>
@@ -433,11 +460,12 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     placeholder="Ex: Passagem aérea"
                                                     value={cost.descricao}
                                                     onChange={(e) =>
-                                                        setCosts(prev =>
-                                                            prev.map(c =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            custos: prev.custos.map(c =>
                                                                 c.id === cost.id ? { ...c, descricao: e.target.value } : c
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
@@ -449,7 +477,10 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     size={"sm"}
                                                     mb={"2px"}
                                                     onClick={() =>
-                                                        setCosts(prev => prev.filter(c => c.id !== cost.id))
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            custos: prev.custos.filter(c => c.id !== cost.id)
+                                                        }))
                                                     }
                                                 >
                                                     <FaTrash />
@@ -457,7 +488,6 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                             </Tooltip>
                                         </Flex>
 
-                                        {/* Linha 2: Valor + Data + Tipo */}
                                         <Flex gap={2} alignItems={"flex-end"} flexWrap={"wrap"}>
                                             <Flex flexDir={"column"} gap={1} flex={1} minW={"100px"}>
                                                 <Text fontSize={"xs"} color={"gray.500"}>Valor (R$)</Text>
@@ -469,11 +499,12 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     placeholder="0,00"
                                                     value={cost.valor}
                                                     onChange={(e) =>
-                                                        setCosts(prev =>
-                                                            prev.map(c =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            custos: prev.custos.map(c =>
                                                                 c.id === cost.id ? { ...c, valor: e.target.value } : c
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
@@ -485,11 +516,12 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     type="date"
                                                     value={cost.data}
                                                     onChange={(e) =>
-                                                        setCosts(prev =>
-                                                            prev.map(c =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            custos: prev.custos.map(c =>
                                                                 c.id === cost.id ? { ...c, data: e.target.value } : c
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
@@ -500,11 +532,12 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                                                     listOptions={optionsCostType}
                                                     value={cost.tipo}
                                                     onValueChange={(e) =>
-                                                        setCosts(prev =>
-                                                            prev.map(c =>
+                                                        setEvent(prev => ({
+                                                            ...prev,
+                                                            custos: prev.custos.map(c =>
                                                                 c.id === cost.id ? { ...c, tipo: e.value[0] ?? "" } : c
                                                             )
-                                                        )
+                                                        }))
                                                     }
                                                 />
                                             </Flex>
@@ -525,6 +558,7 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Portal>
+            <AlertCustom open={openAlert} title="Teste" description="Evento criado com sucesso" status="success" />
         </Dialog.Root>
     )
 }

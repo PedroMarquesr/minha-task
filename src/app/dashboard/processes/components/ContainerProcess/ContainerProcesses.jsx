@@ -83,6 +83,7 @@ export default function ContainerProcesses({ processes = [] }) {
                         partes={process.partes}
                         tags={process.tags}
                         valorCausa={process?.valorCausa}
+                        companyId={process?.companyId}
                       />
                     ))
                   )}
@@ -159,6 +160,7 @@ export default function ContainerProcesses({ processes = [] }) {
                         tribunal={process.tribunal}
                         partes={process.partes}
                         tags={process.tags}
+                        companyId={process?.companyId}
                       />
                     ))
                   )}
@@ -235,6 +237,7 @@ export default function ContainerProcesses({ processes = [] }) {
                         tribunal={process.tribunal}
                         partes={process.partes}
                         tags={process.tags}
+                        companyId={process.companyId}
                       />
                     ))
                   )}
