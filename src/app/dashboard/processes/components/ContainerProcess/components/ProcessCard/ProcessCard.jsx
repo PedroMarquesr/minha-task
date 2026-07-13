@@ -7,12 +7,7 @@ import {
   Button,
 } from "@chakra-ui/react"
 import { useState, useEffect } from "react"
-import {
-  FaAngleDown,
-  FaAngleUp,
-  FaRegUser,
-  FaCalendarPlus,
-} from "react-icons/fa"
+import { FaRegUser, FaCalendarPlus } from "react-icons/fa"
 import { RiMoneyDollarCircleFill } from "react-icons/ri"
 import { MdNextPlan, MdDelete } from "react-icons/md"
 import { formatCurrency } from "@/utils/format"
@@ -24,11 +19,13 @@ import {
   getDocs,
   getDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import DialogNewEvent from "./components/DialogNewEvent/DialogNewEvent"
 import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
 import DialogChangeStatusProcess from "./components/DialogChangeStatusProcess/DialogChangeStatusProcess"
+import DialogConfirmDelete from "./components/DialogConfirmDelete/DialogConfirmDelete"
 import EventCard from "./components/EventCard/EventCard"
 import { useStore } from "@/hooks/useStore"
 export default function ProcessCard({
@@ -47,8 +44,11 @@ export default function ProcessCard({
   const [isDialogNewEventOpen, setIsDialogNewEventOpen] = useState(false)
   const [isDialogChangeStatusOpen, setIsDialogChangeStatusOpen] =
     useState(false)
+  const [isDialogConfirmDelProcessOpen, setIsDialogConfirmDelProcessOpen] =
+    useState(false)
   const [processEvents, setProcessEvents] = useState([])
   const [userRole, setUserRole] = useState([])
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const { user } = useStore()
   const userId = user?.uid
@@ -99,6 +99,15 @@ export default function ProcessCard({
     setIsDialogAddValueOpen(!isDialogAddValueOpen)
   }
 
+  const handleDeleteProcess = async () => {
+    try {
+      const processRef = doc(db, "processes", processId)
+      await deleteDoc(processRef)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const fetchEvents = async () => {
     const q = query(
       collection(db, "events"),
@@ -125,15 +134,6 @@ export default function ProcessCard({
     const role = company.members?.[userId]?.role
     console.log("role:", role)
     setUserRole(role)
-  }
-
-  const handleDeleteProcess = async () => {
-    try {
-      const processRef = doc(db, "processes", processId)
-      await deleteDoc(processRef)
-    } catch (error) {
-      console.log(error)
-    }
   }
 
   useEffect(() => {
@@ -223,7 +223,7 @@ export default function ProcessCard({
                 _hover={{ bg: "transparent", opacity: 0.8 }}
                 color="red.500"
                 _dark={{ color: "red.300" }}
-                onClick={handleDeleteProcess}
+                onClick={() => setIsDialogConfirmDelProcessOpen(true)}
               >
                 <MdDelete size={20} />
               </IconButton>
@@ -431,6 +431,18 @@ export default function ProcessCard({
         isOpen={isDialogChangeStatusOpen}
         setIsOpen={setIsDialogChangeStatusOpen}
         processId={processId}
+      />
+      <DialogConfirmDelete
+        isOpen={isDialogConfirmDelProcessOpen}
+        setIsOpen={setIsDialogConfirmDelProcessOpen}
+        contentDelete={"processo"}
+        processNumber={processNumber}
+        processType={processType}
+        tribunal={tribunal}
+        status={status}
+        partes={partes}
+        tags={tags}
+        valorCausa={valorCausa}
       />
     </Flex>
   )

@@ -6,12 +6,9 @@ import {
   Portal,
   Flex,
   Text,
-  Input,
 } from "@chakra-ui/react"
-import { FaRegUser } from "react-icons/fa"
 
 import { useState } from "react"
-import { formatCurrency } from "@/utils/format"
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore"
 import AlertDefault from "@/components/AlertDefault/AlertDefault"
 import ComboboxProcess from "@/app/dashboard/processes/components/ComboboxProcess/ComboboxProcess"
