@@ -4,11 +4,9 @@ import {
   FaCalendarAlt,
   FaUsers,
   FaDollarSign,
-  FaListAlt,
   FaGavel,
   FaSearch,
   FaFileAlt,
-  FaCalendarPlus,
   FaEllipsisH,
 } from "react-icons/fa"
 import { HiAnnotation } from "react-icons/hi"
