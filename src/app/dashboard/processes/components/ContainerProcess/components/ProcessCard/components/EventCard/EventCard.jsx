@@ -1,4 +1,4 @@
-import { Flex, Text, Badge, Grid, GridItem, Box } from "@chakra-ui/react"
+import { Flex, Text, Badge, IconButton } from "@chakra-ui/react"
 import {
   FaMapMarkerAlt,
   FaCalendarAlt,
@@ -8,8 +8,13 @@ import {
   FaGavel,
   FaSearch,
   FaFileAlt,
+  FaCalendarPlus,
   FaEllipsisH,
 } from "react-icons/fa"
+import { HiAnnotation } from "react-icons/hi"
+import { MdNextPlan, MdDelete } from "react-icons/md"
+
+import { Tooltip } from "@/components/ui/tooltip"
 
 const statusColorMap = {
   agendado: "blue",
@@ -100,7 +105,6 @@ export default function EventCard({ event }) {
       transition="all 0.15s ease"
       _hover={{ borderColor: "gray.200", _dark: { borderColor: "gray.700" } }}
     >
-      {/* Cabeçalho */}
       <Flex justify="space-between" align="center">
         <Flex align="center" gap={2}>
           <Flex
@@ -117,7 +121,12 @@ export default function EventCard({ event }) {
           >
             <TipoIcon />
           </Flex>
-          <Text fontWeight="semibold" fontSize="sm" color="gray.800" _dark={{ color: "gray.100" }}>
+          <Text
+            fontWeight="semibold"
+            fontSize="sm"
+            color="gray.800"
+            _dark={{ color: "gray.100" }}
+          >
             {config.label}
           </Text>
         </Flex>
@@ -135,17 +144,28 @@ export default function EventCard({ event }) {
         )}
       </Flex>
 
-      {/* Data e Local */}
       {(data || local) && (
         <Flex gap={4} flexWrap="wrap">
           {data && (
-            <Flex align="center" gap={1} fontSize="xs" color="gray.600" _dark={{ color: "gray.400" }}>
+            <Flex
+              align="center"
+              gap={1}
+              fontSize="xs"
+              color="gray.600"
+              _dark={{ color: "gray.400" }}
+            >
               <FaCalendarAlt size={11} />
               <Text fontWeight="medium">{formatDate(data)}</Text>
             </Flex>
           )}
           {local && (
-            <Flex align="center" gap={1} fontSize="xs" color="gray.600" _dark={{ color: "gray.400" }}>
+            <Flex
+              align="center"
+              gap={1}
+              fontSize="xs"
+              color="gray.600"
+              _dark={{ color: "gray.400" }}
+            >
               <FaMapMarkerAlt size={11} />
               <Text fontWeight="medium">{local}</Text>
             </Flex>
@@ -153,26 +173,42 @@ export default function EventCard({ event }) {
         </Flex>
       )}
 
-      {/* Tipo de audiência */}
       {tipoAudiencia && (
         <Flex flexDir="column" gap={1}>
           <SectionLabel>Tipo de audiência</SectionLabel>
-          <Text fontSize="xs" fontWeight="medium" color="gray.700" _dark={{ color: "gray.200" }}>
+          <Text
+            fontSize="xs"
+            fontWeight="medium"
+            color="gray.700"
+            _dark={{ color: "gray.200" }}
+          >
             {tipoAudiencia}
           </Text>
         </Flex>
       )}
 
-      {/* Seções Adicionais em container para dar um respiro caso existam */}
-      {(testemunhas.length > 0 || camposCustomizaveis.length > 0 || custos.length > 0) && (
-        <Flex flexDir="column" gap={3} mt={1} pt={3} borderTop="1px dashed" borderColor="gray.200" _dark={{ borderColor: "gray.700" }}>
-          
-          {/* Testemunhas */}
+      {(testemunhas.length > 0 ||
+        camposCustomizaveis.length > 0 ||
+        custos.length > 0) && (
+        <Flex
+          flexDir="column"
+          gap={3}
+          mt={1}
+          pt={3}
+          borderTop="1px dashed"
+          borderColor="gray.200"
+          _dark={{ borderColor: "gray.700" }}
+        >
           {testemunhas.length > 0 && (
             <Flex flexDir="column" gap={1.5}>
               <Flex align="center" gap={1}>
                 <SectionLabel>Testemunhas</SectionLabel>
-                <Badge colorPalette="purple" variant="subtle" fontSize="2xs" borderRadius="full">
+                <Badge
+                  colorPalette="purple"
+                  variant="subtle"
+                  fontSize="2xs"
+                  borderRadius="full"
+                >
                   {testemunhas.length}
                 </Badge>
               </Flex>
@@ -191,8 +227,15 @@ export default function EventCard({ event }) {
                     _dark={{ bg: "purple.900", borderColor: "purple.800" }}
                     fontSize="xs"
                   >
-                    <FaUsers size={10} color="var(--chakra-colors-purple-500)" />
-                    <Text color="gray.800" _dark={{ color: "gray.100" }} fontWeight="medium">
+                    <FaUsers
+                      size={10}
+                      color="var(--chakra-colors-purple-500)"
+                    />
+                    <Text
+                      color="gray.800"
+                      _dark={{ color: "gray.100" }}
+                      fontWeight="medium"
+                    >
                       {w.nome}
                     </Text>
                     {w.contato && (
@@ -206,14 +249,14 @@ export default function EventCard({ event }) {
             </Flex>
           )}
 
-          {/* Campos customizáveis */}
           {camposCustomizaveis.length > 0 && (
             <Flex flexDir="column" gap={1.5}>
               <SectionLabel>Campos adicionais</SectionLabel>
               <Flex gap={2} flexWrap="wrap">
                 {camposCustomizaveis.map((field) => {
                   let valorDisplay = field.valor
-                  if (field.tipo === "check") valorDisplay = field.valor ? "Sim" : "Não"
+                  if (field.tipo === "check")
+                    valorDisplay = field.valor ? "Sim" : "Não"
                   if (field.tipo === "lista" && Array.isArray(field.valor))
                     valorDisplay = field.valor.map((v) => v.texto).join(", ")
 
@@ -232,8 +275,14 @@ export default function EventCard({ event }) {
                       gap={1.5}
                       align="center"
                     >
-                      <Text color="gray.500" _dark={{ color: "gray.400" }}>{field.label}:</Text>
-                      <Text fontWeight="semibold" color="gray.800" _dark={{ color: "gray.200" }}>
+                      <Text color="gray.500" _dark={{ color: "gray.400" }}>
+                        {field.label}:
+                      </Text>
+                      <Text
+                        fontWeight="semibold"
+                        color="gray.800"
+                        _dark={{ color: "gray.200" }}
+                      >
                         {valorDisplay ?? "—"}
                       </Text>
                     </Flex>
@@ -243,13 +292,23 @@ export default function EventCard({ event }) {
             </Flex>
           )}
 
-          {/* Custos */}
           {custos.length > 0 && (
             <Flex flexDir="column" gap={1.5}>
               <Flex align="center" gap={2}>
                 <SectionLabel>Custos</SectionLabel>
-                <Text fontSize="xs" fontWeight="semibold" color="orange.600" _dark={{ color: "orange.400" }}>
-                  Total: {formatCurrency(custos.reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0))}
+                <Text
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="orange.600"
+                  _dark={{ color: "orange.400" }}
+                >
+                  Total:{" "}
+                  {formatCurrency(
+                    custos.reduce(
+                      (acc, c) => acc + (parseFloat(c.valor) || 0),
+                      0,
+                    ),
+                  )}
                 </Text>
               </Flex>
               <Flex gap={2} flexWrap="wrap">
@@ -268,13 +327,24 @@ export default function EventCard({ event }) {
                     gap={2}
                     align="center"
                   >
-                    <FaDollarSign size={11} color="var(--chakra-colors-orange-500)" />
+                    <FaDollarSign
+                      size={11}
+                      color="var(--chakra-colors-orange-500)"
+                    />
                     <Flex flexDir="column">
-                      <Text fontWeight="medium" color="gray.800" _dark={{ color: "gray.200" }}>
+                      <Text
+                        fontWeight="medium"
+                        color="gray.800"
+                        _dark={{ color: "gray.200" }}
+                      >
                         {cost.descricao || cost.tipo || "Custo"}
                       </Text>
                     </Flex>
-                    <Text color="orange.700" _dark={{ color: "orange.300" }} fontWeight="bold">
+                    <Text
+                      color="orange.700"
+                      _dark={{ color: "orange.300" }}
+                      fontWeight="bold"
+                    >
                       {formatCurrency(cost.valor)}
                     </Text>
                     {cost.data && (
@@ -289,6 +359,50 @@ export default function EventCard({ event }) {
           )}
         </Flex>
       )}
+      <Flex justify="flex-start" align="center">
+        <Tooltip content="Adicionar anotação" placement="top">
+          <IconButton
+            variant="ghost"
+            cursor="pointer"
+            p={0}
+            minW="auto"
+            h="auto"
+            _hover={{ bg: "transparent", opacity: 0.8 }}
+            color="purple.500"
+            _dark={{ color: "purple.300" }}
+          >
+            <HiAnnotation size={12} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip content="Atualizar status do Evento" placement="top">
+          <IconButton
+            variant="ghost"
+            cursor="pointer"
+            p={0}
+            minW="auto"
+            h="auto"
+            _hover={{ bg: "transparent", opacity: 0.8 }}
+            color="blue.500"
+            _dark={{ color: "blue.300" }}
+          >
+            <MdNextPlan size={20} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip content="Deletar Evento" placement="top">
+          <IconButton
+            variant="ghost"
+            cursor="pointer"
+            p={0}
+            minW="auto"
+            h="auto"
+            _hover={{ bg: "transparent", opacity: 0.8 }}
+            color="red.500"
+            _dark={{ color: "red.300" }}
+          >
+            <MdDelete size={20} />
+          </IconButton>
+        </Tooltip>
+      </Flex>
     </Flex>
   )
 }

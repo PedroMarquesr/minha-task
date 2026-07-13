@@ -5,7 +5,6 @@ import {
   Badge,
   IconButton,
   Button,
-
 } from "@chakra-ui/react"
 import { useState, useEffect } from "react"
 import {
@@ -15,16 +14,23 @@ import {
   FaCalendarPlus,
 } from "react-icons/fa"
 import { RiMoneyDollarCircleFill } from "react-icons/ri"
-import { MdNextPlan } from "react-icons/md"
+import { MdNextPlan, MdDelete } from "react-icons/md"
 import { formatCurrency } from "@/utils/format"
 import { Tooltip } from "@/components/ui/tooltip"
-import { collection, query, where, getDocs, QuerySnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore"
+import { db } from "@/lib/firebase"
 import DialogNewEvent from "./components/DialogNewEvent/DialogNewEvent"
 import DialogAddValueprocess from "./components/DialogAddValueprocess/DialogAddValueprocess"
-
+import DialogChangeStatusProcess from "./components/DialogChangeStatusProcess/DialogChangeStatusProcess"
 import EventCard from "./components/EventCard/EventCard"
-
+import { useStore } from "@/hooks/useStore"
 export default function ProcessCard({
   processNumber,
   processId,
@@ -35,13 +41,17 @@ export default function ProcessCard({
   tags = [],
   events = [],
   valorCausa,
-  companyId
+  companyId,
 }) {
   const [isDialogAddValueOpen, setIsDialogAddValueOpen] = useState(false)
-  const [isOpenAlert, setIsOpenAlert] = useState(false)
   const [isDialogNewEventOpen, setIsDialogNewEventOpen] = useState(false)
+  const [isDialogChangeStatusOpen, setIsDialogChangeStatusOpen] =
+    useState(false)
   const [processEvents, setProcessEvents] = useState([])
+  const [userRole, setUserRole] = useState([])
 
+  const { user } = useStore()
+  const userId = user?.uid
 
   const handleColorStatus = (status) => {
     switch (status) {
@@ -89,22 +99,50 @@ export default function ProcessCard({
     setIsDialogAddValueOpen(!isDialogAddValueOpen)
   }
 
-
   const fetchEvents = async () => {
-    const q = query(collection(db, 'events'),
-      where('companyId', '==', companyId),
-      where('processId', '==', processId),
+    const q = query(
+      collection(db, "events"),
+      where("companyId", "==", companyId),
+      where("processId", "==", processId),
     )
     const querySnapshot = await getDocs(q)
     const data = querySnapshot.docs.map((doc) => doc.data())
     setProcessEvents(data)
   }
 
+  const fetchUserRole = async () => {
+    console.log("companyId:", companyId)
+    console.log("userId:", userId)
+    const companyRef = doc(db, "companies", companyId)
+    const companySnap = await getDoc(companyRef)
+    if (!companySnap.exists()) {
+      console.log("Empresa não encontrada")
+      return
+    }
+
+    const company = companySnap.data()
+    console.log(company)
+    const role = company.members?.[userId]?.role
+    console.log("role:", role)
+    setUserRole(role)
+  }
+
+  const handleDeleteProcess = async () => {
+    try {
+      const processRef = doc(db, "processes", processId)
+      await deleteDoc(processRef)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    console.log(events)
     fetchEvents()
   }, [processId])
 
+  useEffect(() => {
+    fetchUserRole()
+  }, [])
   return (
     <Flex
       key={processId}
@@ -127,6 +165,7 @@ export default function ProcessCard({
         >
           {processNumber}
         </Text>
+
         <Flex>
           <Tooltip content="Adicionar evento" placement="top">
             <IconButton
@@ -168,10 +207,28 @@ export default function ProcessCard({
               _hover={{ bg: "transparent", opacity: 0.8 }}
               color="green.500"
               _dark={{ color: "green.300" }}
+              onClick={() => setIsDialogChangeStatusOpen(true)}
             >
               <MdNextPlan size={20} />
             </IconButton>
           </Tooltip>
+          {userRole === "owner" && (
+            <Tooltip content="Deletar processo" placement="top">
+              <IconButton
+                variant="ghost"
+                cursor="pointer"
+                p={0}
+                minW="auto"
+                h="auto"
+                _hover={{ bg: "transparent", opacity: 0.8 }}
+                color="red.500"
+                _dark={{ color: "red.300" }}
+                onClick={handleDeleteProcess}
+              >
+                <MdDelete size={20} />
+              </IconButton>
+            </Tooltip>
+          )}
         </Flex>
       </Flex>
       <Flex align={"center"} gap={2} flexWrap="wrap">
@@ -218,7 +275,6 @@ export default function ProcessCard({
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
               <Flex p={3} flexDir={"column"} gap={2}>
-
                 <Flex flexDir={"column"} gap={1}>
                   <Text
                     fontSize="xs"
@@ -235,7 +291,12 @@ export default function ProcessCard({
                       Não registrado
                     </Text>
                   ) : (
-                    <Text fontWeight="semibold" fontSize="sm" color={"gray.700"} _dark={{ color: "gray.200" }}>
+                    <Text
+                      fontWeight="semibold"
+                      fontSize="sm"
+                      color={"gray.700"}
+                      _dark={{ color: "gray.200" }}
+                    >
                       {formatCurrency(valorCausa)}
                     </Text>
                   )}
@@ -315,10 +376,20 @@ export default function ProcessCard({
                         <Accordion.Root collapsible w="100%">
                           <Accordion.Item value="eventos">
                             <Accordion.ItemTrigger>
-                              <Flex flexDir={"row"} gap={2} alignItems={"center"} w="100%">
+                              <Flex
+                                flexDir={"row"}
+                                gap={2}
+                                alignItems={"center"}
+                                w="100%"
+                              >
                                 <Flex color={"gray.500"} fontSize="sm" gap={2}>
                                   <Text>Eventos cadastrados</Text>
-                                  <Badge colorPalette={"purple"} variant={"surface"}>{processEvents.length}</Badge>
+                                  <Badge
+                                    colorPalette={"purple"}
+                                    variant={"surface"}
+                                  >
+                                    {processEvents.length}
+                                  </Badge>
                                 </Flex>
                                 <Accordion.ItemIndicator />
                               </Flex>
@@ -326,7 +397,10 @@ export default function ProcessCard({
                             <Accordion.ItemContent>
                               <Flex flexDir="column" gap={2}>
                                 {processEvents.map((event, index) => (
-                                  <EventCard key={event.id ?? index} event={event} />
+                                  <EventCard
+                                    key={event.id ?? index}
+                                    event={event}
+                                  />
                                 ))}
                               </Flex>
                             </Accordion.ItemContent>
@@ -351,6 +425,11 @@ export default function ProcessCard({
       <DialogNewEvent
         isOpen={isDialogNewEventOpen}
         setIsOpen={setIsDialogNewEventOpen}
+        processId={processId}
+      />
+      <DialogChangeStatusProcess
+        isOpen={isDialogChangeStatusOpen}
+        setIsOpen={setIsDialogChangeStatusOpen}
         processId={processId}
       />
     </Flex>
