@@ -1,21 +1,15 @@
-import {
-  Button,
-  CloseButton,
-  Dialog,
-  Icon,
-  Portal,
-  Flex,
-  Text,
-  Input,
-} from "@chakra-ui/react"
+import { Button, Dialog, Portal, Flex } from "@chakra-ui/react"
 import ContentConfirmDelProcesse from "./components/ContentConfirmDelProcesse/ContentConfirmDelProcesse"
 import ContentConfirmDelEvent from "./components/ContentConfirmDelEvent/ContentConfirmDelEvent"
-
+import { doc, deleteDoc } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import { useState } from "react"
 export default function DialogConfirmDelete({
   isOpen,
   setIsOpen,
   contentDelete,
   processNumber,
+  processId,
   processType,
   tribunal,
   status,
@@ -23,6 +17,16 @@ export default function DialogConfirmDelete({
   tags,
   valorCausa,
 }) {
+  const handleDeleteProcess = async () => {
+    try {
+      const processRef = doc(db, "processes", processId)
+      await deleteDoc(processRef)
+      setIsOpen(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <>
       <Dialog.Root open={isOpen}>
@@ -57,7 +61,11 @@ export default function DialogConfirmDelete({
                     Cancelar
                   </Button>
                 </Dialog.ActionTrigger>
-                <Button colorPalette="red" _hover={{ bg: "red.500" }}>
+                <Button
+                  colorPalette="red"
+                  _hover={{ bg: "red.500" }}
+                  onClick={handleDeleteProcess}
+                >
                   Excluir
                 </Button>
               </Dialog.Footer>

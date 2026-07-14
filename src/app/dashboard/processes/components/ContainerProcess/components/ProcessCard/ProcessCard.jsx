@@ -48,7 +48,6 @@ export default function ProcessCard({
     useState(false)
   const [processEvents, setProcessEvents] = useState([])
   const [userRole, setUserRole] = useState([])
-  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const { user } = useStore()
   const userId = user?.uid
@@ -443,6 +442,7 @@ export default function ProcessCard({
         partes={partes}
         tags={tags}
         valorCausa={valorCausa}
+        processId={processId}
       />
     </Flex>
   )
