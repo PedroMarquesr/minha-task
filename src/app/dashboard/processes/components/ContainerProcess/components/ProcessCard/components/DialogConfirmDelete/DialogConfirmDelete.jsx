@@ -13,14 +13,31 @@ export default function DialogConfirmDelete({
   processType,
   tribunal,
   status,
+  tipo,
+  data,
+  local,
+  tipoAudiencia,
+  testemunhas,
+  custos,
+  userCreator,
   partes,
   tags,
   valorCausa,
+  eventId,
 }) {
   const handleDeleteProcess = async () => {
     try {
       const processRef = doc(db, "processes", processId)
       await deleteDoc(processRef)
+      setIsOpen(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const handleDeleteEvent = async () => {
+    try {
+      const eventRef = doc(db, "events", eventId)
+      await deleteDoc(eventRef)
       setIsOpen(false)
     } catch (error) {
       console.log(error)
@@ -36,7 +53,15 @@ export default function DialogConfirmDelete({
               <Dialog.Header>
                 <Flex flexDir="column">
                   <Dialog.Title>
-                    Confirmação de exclusão de processo
+                    {contentDelete === "processo" ? (
+                      <>
+                        Confirmação de exclusão de processo
+                      </>
+                    ) : (
+                      <>
+                        Confirmação de exclusão de evento
+                      </>
+                    )}
                   </Dialog.Title>
                 </Flex>
               </Dialog.Header>
@@ -52,7 +77,17 @@ export default function DialogConfirmDelete({
                     valorCausa={valorCausa}
                   />
                 ) : (
-                  <ContentConfirmDelEvent />
+                  <ContentConfirmDelEvent
+                    tipo={tipo}
+                    data={data}
+                    status={status}
+                    local={local}
+                    tipoAudiencia={tipoAudiencia}
+                    testemunhas={testemunhas}
+                    custos={custos}
+                    userCreator={userCreator}
+                    processNumber={processNumber}
+                  />
                 )}
               </Dialog.Body>
               <Dialog.Footer>
@@ -64,9 +99,10 @@ export default function DialogConfirmDelete({
                 <Button
                   colorPalette="red"
                   _hover={{ bg: "red.500" }}
-                  onClick={handleDeleteProcess}
+                  onClick={contentDelete === "processo" ? handleDeleteProcess : handleDeleteEvent
+                  }
                 >
-                  Excluir
+                  Excluir processo
                 </Button>
               </Dialog.Footer>
             </Dialog.Content>
