@@ -16,10 +16,9 @@ import {
   collection,
   query,
   where,
-  getDocs,
+  onSnapshot,
   getDoc,
   doc,
-  deleteDoc,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import DialogNewEvent from "./components/DialogNewEvent/DialogNewEvent"
@@ -42,10 +41,8 @@ export default function ProcessCard({
 }) {
   const [isDialogAddValueOpen, setIsDialogAddValueOpen] = useState(false)
   const [isDialogNewEventOpen, setIsDialogNewEventOpen] = useState(false)
-  const [isDialogChangeStatusOpen, setIsDialogChangeStatusOpen] =
-    useState(false)
-  const [isDialogConfirmDelProcessOpen, setIsDialogConfirmDelProcessOpen] =
-    useState(false)
+  const [isDialogChangeStatusOpen, setIsDialogChangeStatusOpen] = useState(false)
+  const [isDialogConfirmDelProcessOpen, setIsDialogConfirmDelProcessOpen] = useState(false)
   const [processEvents, setProcessEvents] = useState([])
   const [userRole, setUserRole] = useState([])
 
@@ -98,29 +95,7 @@ export default function ProcessCard({
     setIsDialogAddValueOpen(!isDialogAddValueOpen)
   }
 
-  const handleDeleteProcess = async () => {
-    try {
-      const processRef = doc(db, "processes", processId)
-      await deleteDoc(processRef)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const fetchEvents = async () => {
-    const q = query(
-      collection(db, "events"),
-      where("companyId", "==", companyId),
-      where("processId", "==", processId),
-    )
-    const querySnapshot = await getDocs(q)
-    const data = querySnapshot.docs.map((doc) => doc.data())
-    setProcessEvents(data)
-  }
-
   const fetchUserRole = async () => {
-    console.log("companyId:", companyId)
-    console.log("userId:", userId)
     const companyRef = doc(db, "companies", companyId)
     const companySnap = await getDoc(companyRef)
     if (!companySnap.exists()) {
@@ -129,19 +104,35 @@ export default function ProcessCard({
     }
 
     const company = companySnap.data()
-    console.log(company)
     const role = company.members?.[userId]?.role
-    console.log("role:", role)
     setUserRole(role)
   }
 
   useEffect(() => {
-    fetchEvents()
-  }, [processId])
+    if (!processId || !companyId) return
+
+    const q = query(
+      collection(db, "events"),
+      where("companyId", "==", companyId),
+      where("processId", "==", processId),
+    )
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setProcessEvents(data)
+    })
+
+    return () => unsubscribe()
+  }, [processId, companyId])
 
   useEffect(() => {
+    if (!companyId || !userId) return
     fetchUserRole()
-  }, [])
+  }, [companyId, userId])
+
   return (
     <Flex
       key={processId}
@@ -395,11 +386,8 @@ export default function ProcessCard({
                             </Accordion.ItemTrigger>
                             <Accordion.ItemContent>
                               <Flex flexDir="column" gap={2}>
-                                {processEvents.map((event, index) => (
-                                  <EventCard
-                                    key={event.id ?? index}
-                                    event={event}
-                                  />
+                                {processEvents.map((event) => (
+                                  <EventCard key={event.id} event={event} />
                                 ))}
                               </Flex>
                             </Accordion.ItemContent>
