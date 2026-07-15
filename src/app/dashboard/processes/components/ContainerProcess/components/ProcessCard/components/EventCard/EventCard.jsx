@@ -1,17 +1,35 @@
-import { Flex, Text, Badge, IconButton } from "@chakra-ui/react"
-import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaDollarSign, FaGavel, FaSearch, FaFileAlt, FaEllipsisH } from "react-icons/fa"
+import {
+  Flex,
+  Text,
+  Badge,
+  IconButton,
+  Highlight,
+  Menu,
+  Portal,
+} from "@chakra-ui/react"
+import {
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaUsers,
+  FaDollarSign,
+  FaGavel,
+  FaSearch,
+  FaFileAlt,
+  FaEllipsisH,
+} from "react-icons/fa"
 import { HiAnnotation } from "react-icons/hi"
 import { MdNextPlan, MdDelete } from "react-icons/md"
 import DialogConfirmDelete from "../DialogConfirmDelete/DialogConfirmDelete"
 import { Tooltip } from "@/components/ui/tooltip"
 import { useState } from "react"
+import MenuEditStatus from "./components/MenuEditStatus/MenuEditStatus"
 
-const statusColorMap = {
-  agendado: "blue",
-  realizado: "green",
-  cancelado: "red",
-  redesignacao: "orange",
-}
+// const statusColorMap = {
+//   agendado: "blue",
+//   realizado: "green",
+//   cancelado: "red",
+//   redesignacao: "orange",
+// }
 
 const tipoConfig = {
   audiencia: { label: "Audiência", icon: FaGavel, color: "purple" },
@@ -70,12 +88,14 @@ export default function EventCard({ event, processNumber }) {
     testemunhas = [],
     camposCustomizaveis = [],
     custos = [],
+    updatedAt,
     userCreator,
   } = event
-  const [isDialogConfirmDelEventOpen, setIsDialogConfirmDelEventOpen] = useState(false)
+  const [isDialogConfirmDelEventOpen, setIsDialogConfirmDelEventOpen] =
+    useState(false)
   const config = tipoConfig[tipo] ?? tipoConfig.outro
   const TipoIcon = config.icon
-  const statusColor = statusColorMap[status] ?? "gray"
+  // const statusColor = statusColorMap[status] ?? "gray"
   const borderLeft = tipoBorderColor[tipo] ?? "gray.300"
   const bg = tipoBg[tipo] ?? tipoBg.outro
 
@@ -111,6 +131,7 @@ export default function EventCard({ event, processNumber }) {
           >
             <TipoIcon />
           </Flex>
+
           <Text
             fontWeight="semibold"
             fontSize="sm"
@@ -122,7 +143,7 @@ export default function EventCard({ event, processNumber }) {
         </Flex>
         {status && (
           <Badge
-            colorPalette={statusColor}
+            colorPalette="gray"
             variant="subtle"
             fontSize="2xs"
             px={2}
@@ -180,219 +201,224 @@ export default function EventCard({ event, processNumber }) {
       {(testemunhas.length > 0 ||
         camposCustomizaveis.length > 0 ||
         custos.length > 0) && (
-          <Flex
-            flexDir="column"
-            gap={3}
-            mt={1}
-            pt={3}
-            borderTop="1px dashed"
-            borderColor="gray.200"
-            _dark={{ borderColor: "gray.700" }}
-          >
-            {testemunhas.length > 0 && (
-              <Flex flexDir="column" gap={1.5}>
-                <Flex align="center" gap={1}>
-                  <SectionLabel>Testemunhas</SectionLabel>
-                  <Badge
-                    colorPalette="purple"
-                    variant="subtle"
-                    fontSize="2xs"
-                    borderRadius="full"
+        <Flex
+          flexDir="column"
+          gap={3}
+          mt={1}
+          pt={3}
+          borderTop="1px dashed"
+          borderColor="gray.200"
+          _dark={{ borderColor: "gray.700" }}
+        >
+          {testemunhas.length > 0 && (
+            <Flex flexDir="column" gap={1.5}>
+              <Flex align="center" gap={1}>
+                <SectionLabel>Testemunhas</SectionLabel>
+                <Badge
+                  colorPalette="purple"
+                  variant="subtle"
+                  fontSize="2xs"
+                  borderRadius="full"
+                >
+                  {testemunhas.length}
+                </Badge>
+              </Flex>
+              <Flex gap={2} flexWrap="wrap">
+                {testemunhas.map((w) => (
+                  <Flex
+                    key={w.id}
+                    align="center"
+                    gap={1.5}
+                    px={2.5}
+                    py={1}
+                    borderRadius="md"
+                    bg="purple.50"
+                    border="1px solid"
+                    borderColor="purple.100"
+                    _dark={{ bg: "purple.900", borderColor: "purple.800" }}
+                    fontSize="xs"
                   >
-                    {testemunhas.length}
-                  </Badge>
-                </Flex>
-                <Flex gap={2} flexWrap="wrap">
-                  {testemunhas.map((w) => (
+                    <FaUsers
+                      size={10}
+                      color="var(--chakra-colors-purple-500)"
+                    />
+                    <Text
+                      color="gray.800"
+                      _dark={{ color: "gray.100" }}
+                      fontWeight="medium"
+                    >
+                      {w.nome}
+                    </Text>
+                    {w.contato && (
+                      <Text color="gray.500" _dark={{ color: "gray.400" }}>
+                        · {w.contato}
+                      </Text>
+                    )}
+                  </Flex>
+                ))}
+              </Flex>
+            </Flex>
+          )}
+
+          {camposCustomizaveis.length > 0 && (
+            <Flex flexDir="column" gap={1.5}>
+              <SectionLabel>Campos adicionais</SectionLabel>
+              <Flex gap={2} flexWrap="wrap">
+                {camposCustomizaveis.map((field) => {
+                  let valorDisplay = field.valor
+                  if (field.tipo === "check")
+                    valorDisplay = field.valor ? "Sim" : "Não"
+                  if (field.tipo === "lista" && Array.isArray(field.valor))
+                    valorDisplay = field.valor.map((v) => v.texto).join(", ")
+
+                  return (
                     <Flex
-                      key={w.id}
-                      align="center"
-                      gap={1.5}
+                      key={field.id}
+                      fontSize="xs"
+                      bg="white"
+                      _dark={{ bg: "gray.800" }}
                       px={2.5}
                       py={1}
                       borderRadius="md"
-                      bg="purple.50"
                       border="1px solid"
-                      borderColor="purple.100"
-                      _dark={{ bg: "purple.900", borderColor: "purple.800" }}
-                      fontSize="xs"
-                    >
-                      <FaUsers
-                        size={10}
-                        color="var(--chakra-colors-purple-500)"
-                      />
-                      <Text
-                        color="gray.800"
-                        _dark={{ color: "gray.100" }}
-                        fontWeight="medium"
-                      >
-                        {w.nome}
-                      </Text>
-                      {w.contato && (
-                        <Text color="gray.500" _dark={{ color: "gray.400" }}>
-                          · {w.contato}
-                        </Text>
-                      )}
-                    </Flex>
-                  ))}
-                </Flex>
-              </Flex>
-            )}
-
-            {camposCustomizaveis.length > 0 && (
-              <Flex flexDir="column" gap={1.5}>
-                <SectionLabel>Campos adicionais</SectionLabel>
-                <Flex gap={2} flexWrap="wrap">
-                  {camposCustomizaveis.map((field) => {
-                    let valorDisplay = field.valor
-                    if (field.tipo === "check")
-                      valorDisplay = field.valor ? "Sim" : "Não"
-                    if (field.tipo === "lista" && Array.isArray(field.valor))
-                      valorDisplay = field.valor.map((v) => v.texto).join(", ")
-
-                    return (
-                      <Flex
-                        key={field.id}
-                        fontSize="xs"
-                        bg="white"
-                        _dark={{ bg: "gray.800" }}
-                        px={2.5}
-                        py={1}
-                        borderRadius="md"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        _dark_borderColor="gray.700"
-                        gap={1.5}
-                        align="center"
-                      >
-                        <Text color="gray.500" _dark={{ color: "gray.400" }}>
-                          {field.label}:
-                        </Text>
-                        <Text
-                          fontWeight="semibold"
-                          color="gray.800"
-                          _dark={{ color: "gray.200" }}
-                        >
-                          {valorDisplay ?? "—"}
-                        </Text>
-                      </Flex>
-                    )
-                  })}
-                </Flex>
-              </Flex>
-            )}
-
-            {custos.length > 0 && (
-              <Flex flexDir="column" gap={1.5}>
-                <Flex align="center" gap={2}>
-                  <SectionLabel>Custos</SectionLabel>
-                  <Text
-                    fontSize="xs"
-                    fontWeight="semibold"
-                    color="orange.600"
-                    _dark={{ color: "orange.400" }}
-                  >
-                    Total:{" "}
-                    {formatCurrency(
-                      custos.reduce(
-                        (acc, c) => acc + (parseFloat(c.valor) || 0),
-                        0,
-                      ),
-                    )}
-                  </Text>
-                </Flex>
-                <Flex gap={2} flexWrap="wrap">
-                  {custos.map((cost) => (
-                    <Flex
-                      key={cost.id}
-                      fontSize="xs"
-                      bg="orange.50"
-                      _dark={{ bg: "orange.950" }}
-                      border="1px solid"
-                      borderColor="orange.200"
-                      _dark_borderColor="orange.800"
-                      px={2.5}
-                      py={1.5}
-                      borderRadius="md"
-                      gap={2}
+                      borderColor="gray.200"
+                      _dark_borderColor="gray.700"
+                      gap={1.5}
                       align="center"
                     >
-                      <FaDollarSign
-                        size={11}
-                        color="var(--chakra-colors-orange-500)"
-                      />
-                      <Flex flexDir="column">
-                        <Text
-                          fontWeight="medium"
-                          color="gray.800"
-                          _dark={{ color: "gray.200" }}
-                        >
-                          {cost.descricao || cost.tipo || "Custo"}
-                        </Text>
-                      </Flex>
-                      <Text
-                        color="orange.700"
-                        _dark={{ color: "orange.300" }}
-                        fontWeight="bold"
-                      >
-                        {formatCurrency(cost.valor)}
+                      <Text color="gray.500" _dark={{ color: "gray.400" }}>
+                        {field.label}:
                       </Text>
-                      {cost.data && (
-                        <Text color="gray.500" fontSize="2xs">
-                          · {formatDate(cost.data)}
-                        </Text>
-                      )}
+                      <Text
+                        fontWeight="semibold"
+                        color="gray.800"
+                        _dark={{ color: "gray.200" }}
+                      >
+                        {valorDisplay ?? "—"}
+                      </Text>
                     </Flex>
-                  ))}
-                </Flex>
+                  )
+                })}
               </Flex>
-            )}
-          </Flex>
-        )}
+            </Flex>
+          )}
+
+          {custos.length > 0 && (
+            <Flex flexDir="column" gap={1.5}>
+              <Flex align="center" gap={2}>
+                <SectionLabel>Custos</SectionLabel>
+                <Text
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="orange.600"
+                  _dark={{ color: "orange.400" }}
+                >
+                  Total:{" "}
+                  {formatCurrency(
+                    custos.reduce(
+                      (acc, c) => acc + (parseFloat(c.valor) || 0),
+                      0,
+                    ),
+                  )}
+                </Text>
+              </Flex>
+              <Flex gap={2} flexWrap="wrap">
+                {custos.map((cost) => (
+                  <Flex
+                    key={cost.id}
+                    fontSize="xs"
+                    bg="orange.50"
+                    _dark={{ bg: "orange.950" }}
+                    border="1px solid"
+                    borderColor="orange.200"
+                    _dark_borderColor="orange.800"
+                    px={2.5}
+                    py={1.5}
+                    borderRadius="md"
+                    gap={2}
+                    align="center"
+                  >
+                    <FaDollarSign
+                      size={11}
+                      color="var(--chakra-colors-orange-500)"
+                    />
+                    <Flex flexDir="column">
+                      <Text
+                        fontWeight="medium"
+                        color="gray.800"
+                        _dark={{ color: "gray.200" }}
+                      >
+                        {cost.descricao || cost.tipo || "Custo"}
+                      </Text>
+                    </Flex>
+                    <Text
+                      color="orange.700"
+                      _dark={{ color: "orange.300" }}
+                      fontWeight="bold"
+                    >
+                      {formatCurrency(cost.valor)}
+                    </Text>
+                    {cost.data && (
+                      <Text color="gray.500" fontSize="2xs">
+                        · {formatDate(cost.data)}
+                      </Text>
+                    )}
+                  </Flex>
+                ))}
+              </Flex>
+            </Flex>
+          )}
+        </Flex>
+      )}
       <Flex justify="flex-start" align="center">
-        <Tooltip content="Adicionar anotação" placement="top">
-          <IconButton
-            variant="ghost"
-            cursor="pointer"
-            p={0}
-            minW="auto"
-            h="auto"
-            _hover={{ bg: "transparent", opacity: 0.8 }}
-            color="purple.500"
-            _dark={{ color: "purple.300" }}
-          >
-            <HiAnnotation size={12} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip content="Atualizar status do Evento" placement="top">
-          <IconButton
-            variant="ghost"
-            cursor="pointer"
-            p={0}
-            minW="auto"
-            h="auto"
-            _hover={{ bg: "transparent", opacity: 0.8 }}
-            color="blue.500"
-            _dark={{ color: "blue.300" }}
-          >
-            <MdNextPlan size={20} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip content="Deletar Evento" placement="top">
-          <IconButton
-            variant="ghost"
-            cursor="pointer"
-            p={0}
-            minW="auto"
-            h="auto"
-            _hover={{ bg: "transparent", opacity: 0.8 }}
-            color="red.500"
-            _dark={{ color: "red.300" }}
-            onClick={() => setIsDialogConfirmDelEventOpen(true)}
-          >
-            <MdDelete size={20} />
-          </IconButton>
-        </Tooltip>
+        <Flex>
+          <Tooltip content="Adicionar anotação" placement="top">
+            <IconButton
+              variant="ghost"
+              cursor="pointer"
+              p={0}
+              minW="auto"
+              h="auto"
+              _hover={{ bg: "transparent", opacity: 0.8 }}
+              color="purple.500"
+              _dark={{ color: "purple.300" }}
+            >
+              <HiAnnotation size={12} />
+            </IconButton>
+          </Tooltip>
+          <MenuEditStatus />
+          <Tooltip content="Deletar Evento" placement="top">
+            <IconButton
+              variant="ghost"
+              cursor="pointer"
+              p={0}
+              minW="auto"
+              h="auto"
+              _hover={{ bg: "transparent", opacity: 0.8 }}
+              color="red.500"
+              _dark={{ color: "red.300" }}
+              onClick={() => setIsDialogConfirmDelEventOpen(true)}
+            >
+              <MdDelete size={20} />
+            </IconButton>
+          </Tooltip>
+        </Flex>
+      </Flex>
+      <Flex gap={1} bgColor={"gray.200"} _dark={{ bgColor: "gray.700" }}>
+        <Text fontSize="xs">
+          Criado em{" "}
+          {updatedAt?.toDate
+            ? updatedAt.toDate().toLocaleDateString("pt-BR")
+            : "salvando..."}{" "}
+          as{" "}
+          {updatedAt?.toDate
+            ? updatedAt.toDate().toLocaleTimeString("pt-BR")
+            : ""}{" "}
+          por
+        </Text>
+        <Text fontSize="xs" style={{ fontWeight: "bold" }}>
+          {userCreator}
+        </Text>
       </Flex>
 
       <DialogConfirmDelete
@@ -408,9 +434,8 @@ export default function EventCard({ event, processNumber }) {
         custos={event.custos}
         userCreator={event.userCreator}
         processNumber={processNumber}
-        eventId={event.id} />
-
-
+        eventId={event.id}
+      />
     </Flex>
   )
 }
