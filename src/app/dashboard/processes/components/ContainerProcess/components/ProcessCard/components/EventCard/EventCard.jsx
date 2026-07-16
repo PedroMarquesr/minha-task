@@ -23,6 +23,7 @@ import DialogConfirmDelete from "../DialogConfirmDelete/DialogConfirmDelete"
 import { Tooltip } from "@/components/ui/tooltip"
 import { useState } from "react"
 import MenuEditStatus from "./components/MenuEditStatus/MenuEditStatus"
+import { formatDateTime } from "@/utils/format"
 
 // const statusColorMap = {
 //   agendado: "blue",
@@ -90,6 +91,7 @@ export default function EventCard({ event, processNumber }) {
     custos = [],
     updatedAt,
     userCreator,
+    eventStory,
   } = event
   const [isDialogConfirmDelEventOpen, setIsDialogConfirmDelEventOpen] =
     useState(false)
@@ -404,23 +406,23 @@ export default function EventCard({ event, processNumber }) {
           </Tooltip>
         </Flex>
       </Flex>
-      <Flex gap={1} bgColor={"gray.200"} _dark={{ bgColor: "gray.700" }}>
-        <Text fontSize="xs">
-          Criado em{" "}
-          {updatedAt?.toDate
-            ? updatedAt.toDate().toLocaleDateString("pt-BR")
-            : "salvando..."}{" "}
-          as{" "}
-          {updatedAt?.toDate
-            ? updatedAt.toDate().toLocaleTimeString("pt-BR")
-            : ""}{" "}
-          por
-        </Text>
-        <Text fontSize="xs" style={{ fontWeight: "bold" }}>
-          {userCreator}
-        </Text>
-      </Flex>
 
+      {eventStory?.map((event, index) => (
+        <Flex
+          key={index}
+          gap={1}
+          bgColor={"gray.200"}
+          _dark={{ bgColor: "gray.700" }}
+        >
+          <Text fontSize="xs">
+            {event.line} em {formatDateTime(event.date)} por
+          </Text>
+          <Text fontSize="xs" fontWeight={"bold"}>
+            {" "}
+            {event.userName}
+          </Text>
+        </Flex>
+      ))}
       <DialogConfirmDelete
         isOpen={isDialogConfirmDelEventOpen}
         setIsOpen={setIsDialogConfirmDelEventOpen}

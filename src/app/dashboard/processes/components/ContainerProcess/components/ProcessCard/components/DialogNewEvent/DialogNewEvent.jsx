@@ -42,6 +42,7 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
     if (!user?.companyId) return
 
     const eventId = uuidv4()
+    const now = new Date()
     const eventData = {
       ...event,
       processId,
@@ -51,6 +52,13 @@ export default function DialogNewEvent({ isOpen, setIsOpen, processId }) {
       userCreator: user.displayName ?? "",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
+      eventStory: [
+        {
+          line: "Evento criado",
+          date: now,
+          userName: user.displayName || "",
+        },
+      ],
     }
     console.log("Evento a salvar:", eventData)
     await setDoc(doc(db, "events", eventId), eventData)

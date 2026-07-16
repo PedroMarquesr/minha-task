@@ -2,6 +2,8 @@ import { Menu, Portal, IconButton, Button } from "@chakra-ui/react"
 
 import { MdNextPlan } from "react-icons/md"
 import { Tooltip } from "@/components/ui/tooltip"
+import { useState } from "react"
+import FloatingComentEvent from "./components/FloatingComentEvent/FloatingComentEvent"
 
 export default function MenuEditStatus() {
   const optionsStatusEvent = [
@@ -13,6 +15,7 @@ export default function MenuEditStatus() {
     { label: "Em andamento", value: "em_andamento" },
     { label: "Suspenso", value: "suspenso" },
   ]
+
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
@@ -44,6 +47,7 @@ export default function MenuEditStatus() {
           </Menu.Content>
         </Menu.Positioner>
       </Portal>
+      <FloatingComentEvent />
     </Menu.Root>
   )
 }
