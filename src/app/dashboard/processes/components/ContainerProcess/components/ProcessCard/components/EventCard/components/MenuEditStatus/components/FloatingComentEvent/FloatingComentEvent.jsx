@@ -1,4 +1,3 @@
-
 import {
   Button,
   Textarea,
@@ -14,21 +13,16 @@ import {
   LuX,
 } from "react-icons/lu"
 
-export default function FloatingComentEvent() {
+export default function FloatingComentEvent({ isOpen, onOpenChange }) {
   return (
-    <FloatingPanel.Root>
-      <FloatingPanel.Trigger asChild>
-        <Button variant="outline" size="sm">
-          Open Panel
-        </Button>
-      </FloatingPanel.Trigger>
+    <FloatingPanel.Root open={isOpen} onOpenChange={onOpenChange}>
       <Portal>
         <FloatingPanel.Positioner>
           <FloatingPanel.Content>
             <FloatingPanel.Header>
               <FloatingPanel.DragTrigger>
                 <LuGripHorizontal />
-                <FloatingPanel.Title>Floating Panel</FloatingPanel.Title>
+                <FloatingPanel.Title>Comentário</FloatingPanel.Title>
               </FloatingPanel.DragTrigger>
               <FloatingPanel.Control>
                 <FloatingPanel.StageTrigger stage="minimized" asChild>

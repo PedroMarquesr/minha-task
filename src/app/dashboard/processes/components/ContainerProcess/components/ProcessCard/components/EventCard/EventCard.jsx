@@ -47,10 +47,10 @@ const tipoBorderColor = {
 }
 
 const tipoBg = {
-  audiencia: { light: "purple.50", dark: "purple.950" },
-  pericia: { light: "teal.50", dark: "teal.950" },
-  despacho: { light: "blue.50", dark: "blue.950" },
-  outro: { light: "gray.50", dark: "gray.900" },
+  audiencia: { light: "gray.200", dark: "gray.900" },
+  pericia: { light: "gray.200", dark: "gray.900" },
+  despacho: { light: "gray.200", dark: "gray.900" },
+  outro: { light: "gray.200", dark: "gray.900" },
 }
 
 function formatDate(dateStr) {

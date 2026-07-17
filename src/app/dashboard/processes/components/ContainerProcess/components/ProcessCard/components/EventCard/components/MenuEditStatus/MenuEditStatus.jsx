@@ -1,11 +1,11 @@
-import { Menu, Portal, IconButton, Button } from "@chakra-ui/react"
-
+import { Menu, Portal, IconButton } from "@chakra-ui/react"
 import { MdNextPlan } from "react-icons/md"
 import { Tooltip } from "@/components/ui/tooltip"
 import { useState } from "react"
 import FloatingComentEvent from "./components/FloatingComentEvent/FloatingComentEvent"
-
 export default function MenuEditStatus() {
+  const [openFloating, setOpenFloating] = useState(false)
+
   const optionsStatusEvent = [
     { label: "Agendado", value: "agendado" },
     { label: "Realizado", value: "realizado" },
@@ -39,15 +39,23 @@ export default function MenuEditStatus() {
         <Menu.Positioner>
           <Menu.Content>
             {optionsStatusEvent.map((option) => (
-              <Menu.Item key={option.value} value={option.value}>
+              <Menu.Item
+                _hover={{ bgColor: "gray.400" }}
+                _dark={{ _hover: "gray.200" }}
+                onClick={() => setOpenFloating(!openFloating)}
+                key={option.value}
+                value={option.value}
+              >
                 {option.label}
               </Menu.Item>
             ))}
-            <Menu.Item>teste</Menu.Item>
           </Menu.Content>
         </Menu.Positioner>
       </Portal>
-      <FloatingComentEvent />
+      <FloatingComentEvent
+        isOpen={openFloating}
+        onOpenChange={(details) => setOpenFloating(details.open)}
+      />
     </Menu.Root>
   )
 }
